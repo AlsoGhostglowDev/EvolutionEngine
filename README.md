@@ -10,7 +10,7 @@ Made by:
 ## Information
 If there is any problems with the engine, feel free to open up a Git Issue or:
 - You can personally DM me at discord: **@ghostglowdev**
-- Make a pull request <sub>(See: **[CONTRIBUTING.md](https://github.com/AlsoGhostglowDev/HaxeFlixel-Project-Template/blob/main/CONTRIBUTING.md)**)<sub/>
+- Make a pull request <sub>(See: **[CONTRIBUTING.md](https://github.com/AlsoGhostglowDev/EvolutionEngine/blob/main/CONTRIBUTING.md)**)<sub/>
 
 ---
 

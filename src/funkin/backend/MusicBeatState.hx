@@ -13,4 +13,9 @@ class MusicBeatState extends FlxState {
         controls = new Controls();
         fallbackState = MainMenuState;
     }
+
+	public function lerp(a:Float, b:Float, ratio:Float, ?fpsSensitive:Bool = false) {
+        final lerpRatio = fpsSensitive ? FunkinUtil.getLerpRatio(ratio) : ratio;
+        return FlxMath.lerp(a, b, lerpRatio);
+    }
 }

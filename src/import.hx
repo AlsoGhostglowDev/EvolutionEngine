@@ -29,4 +29,5 @@ using flixel.util.FlxStringUtil;
 
 // imports all the classes from the backend folder
 import funkin.backend.*;
+import funkin.backend.FunkinUtil.*;
 import funkin.backend.system.Paths;

@@ -31,10 +31,6 @@ class MusicBeatState extends FlxState {
         onStepHit.add(stepHit);
 		onBeatHit.add(beatHit);
 		onMeasureHit.add(measureHit);
-
-        trace(Character.justifyEngine(Paths.character('night')));
-
-        trace(funkin.backend.system.Parser.parseCharacter(sys.io.File.getContent(Paths.character('night')), PSYCH).source);
     }
 
 	public function lerp(a:Float, b:Float, ratio:Float, ?fpsSensitive:Bool = false) {

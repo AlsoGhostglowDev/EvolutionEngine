@@ -1,10 +1,9 @@
-package funkin.backend;
+package funkin.backend.utils;
 
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
-
-import flash.media.Sound;
+import openfl.media.Sound;
 
 @:publicFields class FunkinUtil {
     static function getLerpRatio(ratio:Float, ?elapsed:Float)

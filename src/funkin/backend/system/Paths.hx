@@ -1,8 +1,5 @@
 package funkin.backend.system;
 
-import sys.FileSystem;
-import sys.io.File;
-
 import funkin.backend.system.Mods;
 
 @:publicFields class Paths {
@@ -28,7 +25,7 @@ import funkin.backend.system.Mods;
 		return getPath('data/characters/$key', false, Flags.CHAR_EXT);
 
 	inline static function exists(key:String, ?ignoreMods:Bool = #if MODS_ALLOWED false #else true #end):Bool
-		return getPath(key, ignoreMods) == null;
+		return getPath(key, ignoreMods) != null;
 
 	static function getPath(path:String, ?ignoreMods:Bool = false, ?extensions:Array<String>, ?includeDir:Array<String>):Null<String> {
 		if (extensions != null)
@@ -63,7 +60,7 @@ import funkin.backend.system.Mods;
 		for (dir in includeDir) {
 			for (ext in extensions) {
 				final trackedPath = '$dir/$path$ext';
-				if (FileSystem.exists(trackedPath)) {
+				if (FileUtil.exists(trackedPath)) {
 					trace('Path found!: $trackedPath');
 					return trackedPath;
 				}

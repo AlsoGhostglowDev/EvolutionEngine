@@ -1,7 +1,7 @@
 package funkin.backend.system;
 
-#if MODS_ALLOWED
 class Mods {
+	#if MODS_ALLOWED
     public static var currentMod:String = '';
     public static var currentModDirectory(get, never):String;
 
@@ -22,5 +22,5 @@ class Mods {
     public static function getActiveMods() {
 
     }
+	#end
 }
-#end

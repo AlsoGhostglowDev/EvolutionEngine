@@ -21,7 +21,7 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
 
 // using Std.method is too long, lol
-import Std.*;
+import Std.*; //This guy.... 🥀 -TBar
 
 // utils
 using StringTools;
@@ -29,6 +29,9 @@ using flixel.util.FlxStringUtil;
 
 // imports all the classes from the backend folder
 import funkin.backend.*;
-import funkin.backend.FunkinUtil.*;
 import funkin.backend.system.Paths;
 import funkin.backend.system.Conductor;
+
+// utils
+import funkin.backend.utils.FunkinUtil.*;
+import funkin.backend.utils.FileUtil;

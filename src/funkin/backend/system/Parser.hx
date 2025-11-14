@@ -6,8 +6,10 @@ import funkin.game.objects.Character.CodenameAnimationData;
 import funkin.game.objects.Character.CodenameCharacter;
 import funkin.game.objects.Character.PsychAnimationData;
 import funkin.game.objects.Character.PsychCharacter;
-import sys.io.File;
 import tjson.TJSON;
+#if sys
+import sys.io.File;
+#end
 
 enum EngineType
 {
@@ -77,12 +79,20 @@ enum EngineType
 		}
 	}
 
-	static function saveJson(path:String, content:Dynamic)
+	static function saveJson(path:String, content:Dynamic):Bool
 	{
-		if (Paths.exists(path))
-			File.saveContent(path, TJSON.encode(content, FancyStyle));
-		else
-			throw 'saveJson: Path "$path" doesn\'t exist!';
+		#if sys
+		try {
+			if (Paths.exists(path)) {
+				File.saveContent(path, TJSON.encode(content, FancyStyle));
+				return false;
+			} else
+				throw 'saveJson: Path "$path" doesn\'t exist!';
+		} catch(e) {
+			trace('error: ${Std.string(e)}');
+		}
+		#end
+		return false;
 	}
 
 	static function buildXML(data:Dynamic) {}

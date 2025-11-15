@@ -2,7 +2,7 @@ package funkin.backend.system;
 
 class Conductor {
     public static var songPosition(get, never):Float;
-    public static var bpm(default, set):Int = 100;
+    public static var bpm(default, set):Float = 100;
 
     public static var curStep(get, never):Int;
 	public static var curBeat(get, never):Int;
@@ -34,7 +34,7 @@ class Conductor {
     static function get_crochet() return 60000 / bpm;
 	static function get_stepCrochet() return crochet / 4;
 
-	static function set_bpm(newBPM:Int) {
+	static function set_bpm(newBPM:Float) {
         // wip
         return bpm = newBPM; 
     }

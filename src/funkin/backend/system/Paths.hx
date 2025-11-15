@@ -21,11 +21,22 @@ import funkin.backend.system.Mods;
 	inline static function music(key:String):String
 		return getPath('music/$key.${Flags.MUSIC_EXT}');
 
+	inline static function inst(key:String):String
+		return getPath('songs/$key/song/Inst.${Flags.MUSIC_EXT}');
+
+	inline static function voices(key:String):String
+		return getPath('songs/$key/song/Voices.${Flags.MUSIC_EXT}');
+
+	inline static function chart(key:String, ?difficulty:String = 'normal')
+		return getPath('songs/$key/charts/$difficulty', false, Flags.CHART_EXT);
+
 	inline static function character(key:String):String
 		return getPath('data/characters/$key', false, Flags.CHAR_EXT);
 
-	inline static function exists(key:String, ?ignoreMods:Bool = #if MODS_ALLOWED false #else true #end):Bool
-		return getPath(key, ignoreMods) != null;
+	inline static function exists(key:String, ?absolute:Bool = false, ?ignoreMods:Bool = #if MODS_ALLOWED false #else true #end):Bool {
+		if (key == null) return false;
+		return absolute ? FileUtil.exists(key) : (getPath(key, ignoreMods) != null);
+	}
 
 	static function getPath(path:String, ?ignoreMods:Bool = false, ?extensions:Array<String>, ?includeDir:Array<String>):Null<String> {
 		if (extensions != null)
@@ -33,7 +44,7 @@ import funkin.backend.system.Mods;
 				if (!ext.startsWith('.'))
 					extensions[i] = '.$ext';
 			}
-		
+
 		extensions ??= [''];
 		if (includeDir == null) {
 			includeDir ??= [ // sort in order of hierarchy

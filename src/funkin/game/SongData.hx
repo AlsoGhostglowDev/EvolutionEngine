@@ -25,7 +25,8 @@ typedef Song = {
 	bpm:Float,
 	scrollSpeed:Float,
 	notes:Array<ChartNote>,
-    postfix:String // for unique Inst/Voices for each difficulties
+    postfix:String, // for unique Inst/Voices for each difficulties
+    evoChart:Bool
 }
 
 typedef PsychSection = {
@@ -77,8 +78,8 @@ class SongData {
         #end
 		var chartData = Parser.chart(FileUtil.getContent(sourceData), chartEngine);
 
-        //if (chartEngine != EVOLUTION)
-		//	Parser.saveJson('songs/$songPath/charts/$difficulty', chartData);
+        if (chartEngine != EVOLUTION)
+			Parser.saveJson('songs/$songPath/charts/$difficulty', chartData);
 
         this.songPath = songPath;
         songName = chartData.song;
@@ -95,7 +96,7 @@ class SongData {
                 return VSLICE;
 
 			var json = TJSON.parse(FileUtil.getContent(path));
-			if (Reflect.hasField(json, 'songPath'))
+			if (Reflect.hasField(json, 'evoChart') && json.evoChart ?? false == true)
 				return EVOLUTION;
 			else if (Reflect.hasField(json, 'validScore'))
 				return PSYCH;

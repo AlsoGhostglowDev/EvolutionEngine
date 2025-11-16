@@ -9,10 +9,10 @@ import openfl.utils.Assets as OpenFLAssets;
 #end
 
 @:publicFields class FunkinUtil {
-    static function getLerpRatio(ratio:Float, ?elapsed:Float)
+    static inline function getLerpRatio(ratio:Float, ?elapsed:Float)
 		return 1.0 - Math.pow(1.0 - ratio, (elapsed ?? FlxG.elapsed) * 60);
 
-	static function loadSparrowAtlas(path:String) {
+	static inline function loadSparrowAtlas(path:String) {
 		var graphic = FlxGraphic.fromAssetKey(Paths.image(path));
 		return FlxAtlasFrames.fromSparrow(graphic, Paths.sparrow(path));
 	}
@@ -28,7 +28,7 @@ import openfl.utils.Assets as OpenFLAssets;
 			sprite.loadGraphic(Paths.image(path));
     }
 
-	static function loadSound(path:String) {
+	static inline function loadSound(path:String) {
 		#if web
 		return OpenFLAssets.getSound(path);
 		#else
@@ -36,8 +36,37 @@ import openfl.utils.Assets as OpenFLAssets;
 		#end
 	}
 
-	static function fromRGBArray(rgb:Array<Int>)
+	static inline function fromRGBArray(rgb:Array<Int>)
 		return FlxColor.fromRGB(rgb[0], rgb[1], rgb[2]);
+
+	static function attemptAddAnimationByPrefix(sprite:FlxSprite, animName:String, prefix:String, frameRate:Int, looped:Bool) {
+		var success:Bool;
+		var test:Array<flixel.graphics.frames.FlxFrame> = [];
+
+		@:privateAccess
+		sprite.animation.findByPrefix(test, prefix);
+		success = test.length > 0;
+		
+		if (success && sprite.frames != null)
+			sprite.animation.addByPrefix(animName, prefix, frameRate, looped);
+
+		return success;
+	}
+
+	static inline function first<T>(list:Array<T>, ?toFind:T):T {
+		if (toFind != null)
+			return list.filter(e -> e == toFind).shift();
+		else
+			return list[0];
+	}
+
+	static inline function last<T>(list:Array<T>, ?toFind:T):T {
+		if (toFind != null)
+			return list.filter(e -> e == toFind).pop();
+		else
+			return list[list.length-1];
+	}
+
 
 	static function sum(...tally:Float) {
 		var result:Float = 0;

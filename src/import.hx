@@ -28,6 +28,9 @@ import Std.*; //This guy.... 🥀 -TBar
 using StringTools;
 using flixel.util.FlxStringUtil;
 
+// interfaces
+import funkin.backend.interfaces.*;
+
 // imports all the classes from the backend folder
 import funkin.backend.*;
 import funkin.backend.system.Paths;

@@ -5,6 +5,8 @@ import funkin.game.objects.Character;
 
 import funkin.game.SongData;
 
+import flixel.input.keyboard.FlxKey;
+
 class TestingGrounds extends DebugState {
 	var logoBumpin:LogoBumpin;
 	
@@ -15,8 +17,7 @@ class TestingGrounds extends DebugState {
 
 	var characters:Array<Character> = [];
 
-	public function new()
-	{
+	public function new() {
 		super();
 
 		logoBumpin = new LogoBumpin(0, 0, 'logoBumpin');
@@ -63,15 +64,16 @@ class TestingGrounds extends DebugState {
 		}
 	}
 
-	var strums:Array<FlxSprite> = [];
+	var strums:Array<Strum> = [];
 	var strumPos:Array<Array<Float>> = [];
 	var notes:Array<Note> = [];
 	function loadNotes(data:Song) {
 		for (i in 0...8) {
-			var strum = new FlxSprite(112 * i, 50);
+			var strum = new Strum(112 * i, 50);
 			strum.makeGraphic(112, 112, 0xFFFFFFFF);
 			strum.color = 0xFF858585;
 			if (i > 3) strum.x += FlxG.width / 4;
+			else strum.cpu = true;
 			strums.push(strum);
 			strumPos.push([strum.x, strum.y]);
 			add(strum);
@@ -98,6 +100,28 @@ class TestingGrounds extends DebugState {
 		}
 	}
 
+	var keys:Array<FlxKey> = [A, S, UP, RIGHT];
+	function keyJustPressed(key:Int) {
+		final key = cast(key, FlxKey); 
+		final noteData = keys.indexOf(key);
+
+		FlxTween.cancelTweensOf(strums[noteData + 4]);
+		FlxTween.color(strums[noteData + 4], 0.8, 0xFFFFFFFF, 0xFF858585, {ease: FlxEase.expoOut});
+
+		for (note in notes) {
+			if (note.noteData == noteData && !note.hit && Math.abs(note.strum.y - note.y) <= 120 && !note.strum.cpu) {
+				note.kill();
+
+				final singAnim = ['singLEFT', 'singDOWN', 'singUP', 'singRIGHT'];
+				characters[note.character].playAnim(singAnim[note.noteData], true);
+				
+				FlxTween.cancelTweensOf(note.strum);
+				FlxTween.color(note.strum, 0.8, 0xFF00FF00, 0xFF858585, {ease: FlxEase.expoOut});
+				break;
+			}
+		}
+	}
+
 	override function update(elapsed:Float) {
 		positionNotes(Conductor.songPosition);
 
@@ -109,7 +133,7 @@ class TestingGrounds extends DebugState {
 		}
 
 		for (note in notes) {
-			if (!note.hit) {
+			if (!note.hit && note.strum.cpu) {
 				if (Conductor.songPosition >= note.strumTime) {
 					FlxTween.cancelTweensOf(note.strum);
 					FlxTween.color(note.strum, 0.8, 0xFFFFFFFF, 0xFF858585, {ease: FlxEase.expoOut});
@@ -123,6 +147,21 @@ class TestingGrounds extends DebugState {
 			}
 		}
 
+		if (FlxG.keys.justPressed.R) {
+			for (note in notes)
+			{
+				note.hit = false;
+				note.revive();
+			}
+			FlxG.sound.music.time = 0;
+
+			dad.dance(true);
+			bf.dance(true);
+		}
+
+		if (FlxG.keys.anyJustPressed(keys))
+			keyJustPressed(FlxG.keys.firstJustPressed());
+
 		super.update(elapsed);
 	}
 }
@@ -132,6 +171,10 @@ class Note extends FlxSprite {
 	public var strumTime:Float = 0;
 	public var noteData:Int = 0;
 	public var character:Int = 0;
-	public var strum:FlxSprite;
+	public var strum:Strum;
 	public var hit:Bool = false;
+}
+
+class Strum extends FlxSprite {
+	public var cpu:Bool = false;
 }

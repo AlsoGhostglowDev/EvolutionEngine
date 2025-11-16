@@ -7,6 +7,7 @@ import tjson.TJSON;
 /*
  * Note to future selfs: classes with @:structInit do not work with Json parsing.
  */
+
 typedef AnimationData = {
 	animName:String,
 	prefix:String,
@@ -79,7 +80,7 @@ typedef CodenameCharacter = {
 }
 
 class Character extends FlxSprite {
-	public static var fallbackCharacter = 'bf';
+	public static var FALLBACK_CHARACTER = 'bf';
 
 	public var charData:CharacterData;
 
@@ -90,6 +91,8 @@ class Character extends FlxSprite {
 	public var animationList:Array<String> = [];
 	public var animationData:Map<String, AnimationData> = [];
 	public var animationOffsets:Map<String, FlxPoint> = [];
+
+	public var characterID:Int = 0;
 
 	var __initialized:Bool = false;
 
@@ -107,8 +110,16 @@ class Character extends FlxSprite {
 		this.isPlayer = isPlayer;
 
 		if (!loadCharacter(name)) {
-			loadCharacter(fallbackCharacter);
+			loadCharacter(FALLBACK_CHARACTER);
 			__initialized = true;
+		}
+	}
+
+	// playstate only
+	public function fetchID() {
+		if (MusicBeatState.getState() is PlayState) {
+			final game = cast(MusicBeatState.getState(), PlayState);
+			game.characters.indexOf(this);
 		}
 	}
 

@@ -7,7 +7,7 @@ import funkin.states.*;
 typedef BeatHitSignal = FlxTypedSignal<Int->Void>;
 
 @:access(funkin.backend.system.Conductor)
-class MusicBeatState extends FlxState {
+class MusicBeatState extends FlxState implements IBeatListener {
     public var controls:Controls;
     public var fallbackState:Class<MusicBeatState>;
 
@@ -15,8 +15,13 @@ class MusicBeatState extends FlxState {
     public var onBeatHit:BeatHitSignal;
     public var onMeasureHit:BeatHitSignal;
 
+    // for hscript and lua
+    public static var instance:MusicBeatState;
+
     public function new() {
         super();
+
+        instance = this;
 
         controls = new Controls();
         fallbackState = MainMenuState;
@@ -38,6 +43,9 @@ class MusicBeatState extends FlxState {
         return FlxMath.lerp(a, b, lerpRatio);
     }
 
+    public static function getState():MusicBeatState
+        return cast(FlxG.state, MusicBeatState);
+
 	var __lastStep:Int = -1;
 	var __lastBeat:Int = -1;
 	var __lastMeasure:Int = -1;
@@ -45,17 +53,20 @@ class MusicBeatState extends FlxState {
 		super.update(elapsed);
 
         if (__lastStep != Conductor.curStep)
-            onStepHit.dispatch(Conductor.curStep);
+            for (step in (__lastStep + 1)...Conductor.curStep)
+                onStepHit.dispatch(step);
 
 		if (__lastBeat != Conductor.curBeat)
-			onBeatHit.dispatch(Conductor.curBeat);
+			for (beat in (__lastBeat + 1)...Conductor.curBeat)
+			    onBeatHit.dispatch(beat);
 
-		// if (__lastMeasure != Conductor.curStep)
-		// 	onMeasureHit.dispatch(Conductor.curMeasure);
+		if (__lastMeasure != Conductor.curStep)
+			for (measure in (__lastMeasure + 1)...Conductor.curMeasure)
+			    onMeasureHit.dispatch(measure);
 
         __lastStep    = Conductor.curStep;
 		__lastBeat    = Conductor.curBeat;
-		// __lastMeasure = Conductor.curMeasure;
+		__lastMeasure = Conductor.curMeasure;
     }
 
     public function stepHit(curStep:Int) {}

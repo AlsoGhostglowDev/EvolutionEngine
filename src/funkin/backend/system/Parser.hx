@@ -98,7 +98,8 @@ enum ChartEngineType {
 							bpm: data.bpm,
 							scrollSpeed: data.speed,
 							notes: notes,
-							postfix: ''
+							postfix: '',
+							evoChart: true
 						};
 						return returnData;
 					case PSYCH_LEGACY:

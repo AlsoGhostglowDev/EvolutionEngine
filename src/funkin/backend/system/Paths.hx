@@ -21,11 +21,21 @@ import funkin.backend.system.Mods;
 	inline static function music(key:String):String
 		return getPath('music/$key.${Flags.MUSIC_EXT}');
 
-	inline static function inst(key:String):String
-		return getPath('songs/$key/song/Inst.${Flags.MUSIC_EXT}');
+	inline static function inst(key:String, ?postfix:String = ''):String {
+		final prePath:String = song(key);
+		if (prePath != null)
+			return getPath('$prePath/song/Inst$postfix.${Flags.MUSIC_EXT}');
 
-	inline static function voices(key:String):String
-		return getPath('songs/$key/song/Voices.${Flags.MUSIC_EXT}');
+		return null;
+	}
+
+	inline static function voices(key:String, ?postfix:String = ''):String {
+		final prePath:String = song(key);
+		if (prePath != null)
+			return getPath('$prePath/song/Voices$postfix.${Flags.MUSIC_EXT}');
+
+		return null;
+	}
 
 	inline static function chart(key:String, ?difficulty:String = 'normal')
 		return getPath('songs/$key/charts/$difficulty', false, Flags.CHART_EXT);
@@ -40,15 +50,29 @@ import funkin.backend.system.Mods;
 
 	// For scripts
 	#if HSCRIPT_ALLOWED
-	static function getHScriptPath(key:String, ?folder:String = "scripts"):String {
+	static function hscript(key:String, ?folder:String = "scripts"):String {
 		return getPath('$folder/$key', false, Flags.HSCRIPT_EXT);
 	}
 	#end
 	#if LUA_ALLOWED
-	static function getLuaPath(key:String, ?folder:String = "scripts"):String {
+	static function lua(key:String, ?folder:String = "scripts"):String {
 		return getPath('$folder/$key', false, Flags.LUA_EXT);
 	}
 	#end
+
+	static function song(key:String, ?returnAbsolute:Bool = false):String {
+		var curPath:String = 'songs/$key'; 
+		var path:String = null;
+
+		if (Paths.exists(curPath))
+			path = curPath;
+		else if (Paths.exists(curPath = 'songs/${key.toLowerCase()}'))
+			path = curPath;
+		else if (Paths.exists(curPath = 'songs/${key.replace(' ', '-')}'))
+			path = curPath;
+
+		return returnAbsolute ? getPath(path) : path;
+	}
 
 	static function getPath(path:String, ?ignoreMods:Bool = false, ?extensions:Array<String>, ?includeDir:Array<String>):Null<String> {
 		if (extensions != null)

@@ -4,6 +4,9 @@ import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import openfl.media.Sound;
+#if web
+import openfl.utils.Assets as OpenFLAssets;
+#end
 
 @:publicFields class FunkinUtil {
     static function getLerpRatio(ratio:Float, ?elapsed:Float)
@@ -25,8 +28,13 @@ import openfl.media.Sound;
 			sprite.loadGraphic(Paths.image(path));
     }
 
-	static function loadSound(path:String)
+	static function loadSound(path:String) {
+		#if web
+		return OpenFLAssets.getSound(path);
+		#else
 		return Sound.fromFile(path);
+		#end
+	}
 
 	static function fromRGBArray(rgb:Array<Int>)
 		return FlxColor.fromRGB(rgb[0], rgb[1], rgb[2]);

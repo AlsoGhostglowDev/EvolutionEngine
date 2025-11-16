@@ -2,8 +2,8 @@ package funkin.backend;
 
 @:publicFields class Flags {
     static var IMAGE_EXT:String = 'png';
-	static var SOUND_EXT:String = 'ogg';
-	static var MUSIC_EXT:String = 'ogg';
+	static var SOUND_EXT:String = #if web 'mp3' #else 'ogg' #end;
+	static var MUSIC_EXT:String = #if web 'mp3' #else 'ogg' #end;
 	static var VIDEO_EXT:String = 'mp4';
 	static var CHAR_EXT:Array<String> = ['json', 'xml'];
 	static var CHART_EXT:Array<String> = ['json', 'fnfc'];

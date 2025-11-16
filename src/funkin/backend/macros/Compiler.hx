@@ -10,6 +10,7 @@ class Compiler
 
 	public static var custom_defines(get, default):Map<String, Dynamic>;
 	private static function get_custom_defines():Map<String, Dynamic> {
+		#if !macro
 		var _customdef:Map<String, Dynamic> = [];
 		_customdef.set("EVOLUTION_ENGINE", true);
 		_customdef.set("EVOLUTION_ENGINE_VER", openfl.Lib.application.meta["version"]);
@@ -18,6 +19,9 @@ class Compiler
 		}
 
 		return _customdef;
+		#else
+		return [];
+		#end
 	}
 
 	public static var defines(get, null):Map<String, Dynamic>;

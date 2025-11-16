@@ -1,9 +1,13 @@
 package funkin.backend;
 
+#if HSCRIPT_ALLOWED
 import funkin.backend.scripting.HScript;
+#end
 
 class ScriptableState extends MusicBeatState implements IScriptable {
+	#if HSCRIPT_ALLOWED
 	public var hscripts:Array<HScript> = [];
+	#end
 	// public var luas:Array<> = []; // to be implemented
 
 	public function call(f:String, ?args:Array<Dynamic>) {
@@ -16,20 +20,20 @@ class ScriptableState extends MusicBeatState implements IScriptable {
 		setLuas(p, v);
     }
 
-	#if LUA_ALLOWED
 	public function callLuas(property:String, ?args:Array<Dynamic>):Void {}
 	public function setLuas(field:String, value:Dynamic):Void {}
-	#end
 
-	#if HSCRIPT_ALLOWED
 	public function callHScript(property:String, ?args:Array<Dynamic>):Void {
+		#if HSCRIPT_ALLOWED
 		for (hscript in hscripts)
 			hscript.call(property, args ?? []); 
+		#end
 	}
 
 	public function setHScript(field:String, value:Dynamic):Void {
+		#if HSCRIPT_ALLOWED
 		for (hscript in hscripts)
 			hscript.set(field, value);
+		#end
 	}
-	#end
 }

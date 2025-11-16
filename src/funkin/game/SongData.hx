@@ -1,7 +1,6 @@
 package funkin.game;
 
 import tjson.TJSON;
-import sys.io.File;
 import funkin.backend.system.Parser;
 
 typedef Player = {
@@ -73,7 +72,9 @@ class SongData {
 		final sourceData = Paths.chart(songPath, difficulty);
 		final chartEngine = justifyEngine(sourceData);
 
+        #if !web
         trace([sourceData, chartEngine]);
+        #end
 		var chartData = Parser.chart(FileUtil.getContent(sourceData), chartEngine);
 
         //if (chartEngine != EVOLUTION)

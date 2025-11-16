@@ -2,7 +2,6 @@ package funkin.game.objects;
 
 import flixel.math.FlxPoint;
 import funkin.backend.system.Parser;
-import sys.io.File;
 import tjson.TJSON;
 
 /*
@@ -116,7 +115,7 @@ class Character extends FlxSprite {
 	public function loadCharacter(charName:String):Bool {
 		final sourceData = Paths.character(charName);
 		final charEngine = justifyEngine(sourceData);
-		var charData = Parser.character(File.getContent(sourceData), charEngine);
+		var charData = Parser.character(FileUtil.getContent(sourceData), charEngine);
 
 		if (charEngine != EVOLUTION) {
 			charData.name = name; 
@@ -192,7 +191,7 @@ class Character extends FlxSprite {
 	public static function justifyEngine(path:String) {
 		if (path.endsWith('.xml'))
 			return CODENAME;
-		else if (Reflect.hasField(TJSON.parse(File.getContent(path)), 'image'))
+		else if (Reflect.hasField(TJSON.parse(FileUtil.getContent(path)), 'image'))
 			return PSYCH;
 		else
 			return EVOLUTION;

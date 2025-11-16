@@ -58,7 +58,9 @@
 	<set name="BUILD_DIR" value="export/32bit" if="32bits" />
 
 	<source name="src" />
-	<assets path="assets" />
+
+	<assets path="assets" exclude="*.ogg" if="web"/>
+	<assets path="assets" exclude="*.mp3" unless="web"/>
 
 	<!-- _______________________________ Libraries ______________________________ -->
 	
@@ -72,7 +74,7 @@
 	<haxelib name="flxanimate"/>
 	
 	<haxelib name="hscript-improved-dev" if="HSCRIPT_ALLOWED"/>
-	<define name="hscriptPos" />
+	<define name="hscriptPos" if="HSCRIPT_ALLOWED" unless="web"/>
 
 	<!-- Disable Discord IO Thread -->
 	<haxedef name="DISCORD_DISABLE_IO_THREAD" if="hxdiscord_rpc" />
@@ -123,6 +125,9 @@
 	
 	<!--Disable deprecated warnings-->
 	<haxedef name='no-deprecation-warnings' />
+
+	<haxeflag name="--macro" value="allowPackage('flash')" />
+	<haxeflag name="--macro" value="funkin.backend.macros.InitMacro.initializeMacros()" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 

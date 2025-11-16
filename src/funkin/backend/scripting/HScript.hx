@@ -6,7 +6,6 @@ import hscript.Expr.Error as HScriptError;
 import hscript.Expr;
 import hscript.Interp;
 import hscript.Parser as HScriptParser; // To not confuse with the funkin parser
-import hscript.Printer;
 #end
 
 class HScript extends Script {
@@ -113,11 +112,11 @@ class HScript extends Script {
 	}
 
 	public function onError(e:HScriptError) {
-		trace(Printer.errorToString(e), 0xFFFF0000);
+		trace(errorToString(e), 0xFFFF0000);
 	}
 
 	public function onWarn(e:HScriptError) {
-		trace("[WARNING] " + Printer.errorToString(e), 0xFFC9C900);
+		trace("[WARNING] " + errorToString(e), 0xFFC9C900);
 	}
 
 	public inline function setParent(newParent:Dynamic):Null<Dynamic> {
@@ -148,6 +147,31 @@ class HScript extends Script {
 		var functionVar = interp.variables.get(func);
 		if (functionVar == null || !Reflect.isFunction(functionVar)) return null;
 		return (args != null && args.length > 0) ? Reflect.callMethod(null, functionVar, args) : functionVar();
+	}
+
+	public static function errorToString(e:HScriptError):String {
+		var message = switch (#if hscriptPos e.e #else e #end) {
+			case EInvalidChar(c): "Invalid character: '"
+				+ (StringTools.isEof(c) ? "EOF (End Of File)" : String.fromCharCode(c))
+				+ "' (" + c + ")";
+			case EUnexpected(s): "Unexpected token: \"" + s + "\"";
+			case EUnterminatedString: "Unterminated string";
+			case EUnterminatedComment: "Unterminated comment";
+			case EInvalidPreprocessor(str): "Invalid preprocessor (" + str + ")";
+			case EUnknownVariable(v): "Unknown variable: " + v;
+			case EInvalidIterator(v): "Invalid iterator: " + v;
+			case EInvalidOp(op): "Invalid operator: " + op;
+			case EInvalidAccess(f): "Invalid access to field " + f;
+			case ECustom(msg): msg;
+			case EInvalidClass(cla): "Invalid class: " + cla + " was not found.";
+			case EAlreadyExistingClass(cla): 'Custom Class named $cla already exists.';
+			default: Std.string(#if hscriptPos e.e #else e #end);
+		};
+		#if hscriptPos
+		return e.origin + ":" + e.line + ": " + message;
+		#else
+		return message;
+		#end
 	}
 	#end
 }

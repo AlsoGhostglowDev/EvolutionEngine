@@ -20,6 +20,10 @@ class InitMacro {
 		for (cls in includeClasses) {
 			MacroCompiler.include(cls);
         }
+
+		#if desktop
+		MacroCompiler.include("openal.ALSoftConfig"); //Just so it gets compiled by DCE
+		#end
     }
     #end
 

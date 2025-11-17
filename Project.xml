@@ -63,6 +63,12 @@
 	<assets path="assets/songs" library="songs" exclude="*.ogg" if="web"/>
 	<assets path="assets/songs" library="songs" exclude="*.mp3" unless="web"/>
 
+	<!-- OpenAL config -->
+	<section if="desktop">
+		<assets path="app/alsoft.txt" rename="plugins/alsoft.ini" type="text" if="windows"/>
+		<assets path="app/alsoft.txt" rename="plugins/alsoft.conf" type="text" unless="windows"/>
+	</section>
+
 	<!-- _______________________________ Libraries ______________________________ -->
 	
 	<haxelib name="flixel" version="5.6.2"/>

@@ -7,8 +7,8 @@ import tjson.TJSON;
 /*
  * Note to future selfs: classes with @:structInit do not work with Json parsing.
  */
-
-typedef AnimationData = {
+typedef AnimationData =
+{
 	animName:String,
 	prefix:String,
 	offset:Array<Int>,
@@ -17,7 +17,8 @@ typedef AnimationData = {
 	looped:Bool
 }
 
-typedef CharacterData = {
+typedef CharacterData =
+{
 	name:String,
 	icon:String,
 	antialiasing:Bool,
@@ -30,7 +31,8 @@ typedef CharacterData = {
 	animations:Array<AnimationData>
 }
 
-typedef PsychAnimationData = {
+typedef PsychAnimationData =
+{
 	anim:String,
 	name:String,
 	offsets:Array<Int>,
@@ -39,7 +41,8 @@ typedef PsychAnimationData = {
 	loop:Bool
 }
 
-typedef PsychCharacter = {
+typedef PsychCharacter =
+{
 	animations:Array<PsychAnimationData>,
 	no_antialiasing:Bool,
 	image:String,
@@ -52,7 +55,8 @@ typedef PsychCharacter = {
 	scale:Float
 }
 
-typedef CodenameAnimationData = {
+typedef CodenameAnimationData =
+{
 	name:String,
 	anim:String,
 	x:String,
@@ -62,7 +66,8 @@ typedef CodenameAnimationData = {
 	indices:String
 }
 
-typedef CodenameCharacter = {
+typedef CodenameCharacter =
+{
 	x:String,
 	y:String,
 	camx:String,
@@ -79,14 +84,21 @@ typedef CodenameCharacter = {
 	scale:String
 }
 
-class Character extends FlxSprite {
+class Character extends FlxSprite implements IBeatListener {
 	public static var FALLBACK_CHARACTER = 'bf';
 
-	public var charData:CharacterData;
+	public var data:CharacterData;
 
 	public var name(default, null):String;
 	public var icon(default, null):String;
 	public var isPlayer(default, set):Bool = false;
+
+	public var allowSing:Bool = false; // for playstate
+	public var stunned:Bool = false;
+	public var danceBeatInterval:Int = 2;
+
+	public var specialAnim:Bool = false; // disallow idle unless forced
+	public var holdTime:Float = 0;
 
 	public var animationList:Array<String> = [];
 	public var animationData:Map<String, AnimationData> = [];
@@ -109,39 +121,61 @@ class Character extends FlxSprite {
 		this.name = name;
 		this.isPlayer = isPlayer;
 
-		if (!loadCharacter(name)) {
-			loadCharacter(FALLBACK_CHARACTER);
-			__initialized = true;
-		}
+		if (!loadCharacter(name))
+			performFallback();
+
+		__initialized = true;
 	}
 
 	// playstate only
 	public function fetchID() {
-		if (MusicBeatState.getState() is PlayState) {
+		if (MusicBeatState.getState() is PlayState)
+		{
 			final game = cast(MusicBeatState.getState(), PlayState);
-			game.characters.indexOf(this);
+			characterID = game.characters.indexOf(this);
 		}
+	}
+
+	var warn:FlxText;
+
+	public function performFallback() {
+		loadCharacter(FALLBACK_CHARACTER);
+
+		setColorTransform(0, 0, 0, 0.5, 127, 127, 127, 0);
+		warn = new FlxText(x, y, 0, 'ERROR:\nCharacter "$name" not found!');
+		warn.offset.set(offset.x, offset.y);
+		warn.setFormat(null, 16, 0xFFFF0000, LEFT);
 	}
 
 	public function loadCharacter(charName:String):Bool {
 		final sourceData = Paths.character(charName);
-		final charEngine = justifyEngine(sourceData);
-		var charData = Parser.character(FileUtil.getContent(sourceData), charEngine);
+		final charEngine = justifyEngine(sourceData ?? '');
+		if (sourceData != null)
+		{
+			var data = Parser.character(FileUtil.getContent(sourceData), charEngine);
 
-		if (charEngine != EVOLUTION) {
-			charData.name = name; 
-			Parser.saveJson('data/characters/$charName', charData);
-		}
+			if (data == null)
+				return false;
 
-		buildCharacter(charData);
+			if (charEngine != EVOLUTION)
+			{
+				data.name = name;
+				Parser.saveJson('data/characters/$charName', data);
+			}
 
-		if (charData != null)
+			buildCharacter(data);
+
+			if (warn != null)
+				warn.destroy();
+
 			return true;
-
+		}
 		return false;
 	}
 
 	public function buildCharacter(data:CharacterData) {
+		this.data = data;
+
 		name = data.name;
 		icon = data.icon;
 		antialiasing = data.antialiasing;
@@ -152,10 +186,11 @@ class Character extends FlxSprite {
 		flipX = isPlayer;
 
 		frames = loadSparrowAtlas('characters/${data.source}');
-		for (anim in data.animations) {
+		for (anim in data.animations)
+		{
 			if (anim.indices != null && anim.indices?.length ?? 0 > 0)
 				animation.addByIndices(anim.animName, anim.prefix, anim.indices, '.${Flags.IMAGE_EXT}', anim.frameRate, anim.looped, data.flipped);
-            else
+			else
 				animation.addByPrefix(anim.animName, anim.prefix, anim.frameRate, anim.looped, data.flipped);
 
 			animationData.set(anim.animName, anim);
@@ -163,12 +198,10 @@ class Character extends FlxSprite {
 			animationList.push(anim.animName);
 		}
 
-		charData = data;
+		// reset to idle
+		dance(true);
 	}
 
-	public var specialAnim:Bool = false; // disallow idle unless forced
-	public var ignoreNotes:Bool = false; // to be used in playstate
-	public var holdTime:Float = 0;
 	public function playAnim(animName:String, ?forced:Bool = false) {
 		animation.play(animName, forced);
 		if (animName.contains('sing'))
@@ -179,32 +212,60 @@ class Character extends FlxSprite {
 
 	var __danceDirection:String = 'left';
 	public function dance(?forced:Bool = false) {
-		if ((!specialAnim && holdTime >= (Conductor.stepCrochet * 0.0011 * charData.holdTime)) 
-			|| (animation.name ?? 'dance').contains('dance') || (animation.name ?? 'idle') == 'idle' 
-			|| forced
-		) {
-			if (animationList.contains('danceLeft') && __danceDirection == 'right') {
-				playAnim('danceLeft', forced);
-				__danceDirection = 'left';
-			} else if (animationList.contains('danceRight') && __danceDirection == 'left') {
-				playAnim('danceRight', forced);
-				__danceDirection = 'right';
-			} else
-			    playAnim('idle', forced);
+		if (data != null)
+		{
+			if ((holdTime >= (Conductor.stepCrochet * 0.0011 * data.holdTime))
+				&& (animation.name ?? 'idle').contains('sing')
+					|| (animation.name ?? 'idle').contains('dance') || (animation.name ?? 'idle') == 'idle' || forced)
+			{
+				if (animationList.contains('danceLeft') && __danceDirection == 'right')
+				{
+					playAnim('danceLeft', forced);
+					__danceDirection = 'left';
+				}
+				else if (animationList.contains('danceRight') && __danceDirection == 'left')
+				{
+					playAnim('danceRight', forced);
+					__danceDirection = 'right';
+				}
+				else
+					playAnim('idle', forced);
+			}
 		}
 	}
+
+	public function beatHit(curBeat:Int) {
+		if (!stunned && !specialAnim && curBeat % danceBeatInterval == 0)
+			dance();
+	}
+
+	public function stepHit(curStep:Int) {}
+	public function measureHit(curMeasure:Int) {}
 
 	override function update(elapsed:Float) {
 		super.update(elapsed);
 		holdTime += elapsed;
 	}
 
+	override function draw() {
+		super.draw();
+		if (warn != null)
+		{
+			warn.draw();
+			warn.setPosition(x + (frameWidth - warn.width) / 2, y + (frameHeight - warn.height) / 2);
+		}
+	}
+
 	public static function justifyEngine(path:String) {
-		if (path.endsWith('.xml'))
-			return CODENAME;
-		else if (Reflect.hasField(TJSON.parse(FileUtil.getContent(path)), 'image'))
-			return PSYCH;
-		else
-			return EVOLUTION;
+		if (Paths.exists(path, true))
+		{
+			if (path.endsWith('.xml'))
+				return CODENAME;
+			else if (Reflect.hasField(TJSON.parse(FileUtil.getContent(path)), 'image'))
+				return PSYCH;
+			else
+				return EVOLUTION;
+		}
+		return UNKNOWN;
 	}
 }

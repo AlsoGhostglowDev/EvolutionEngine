@@ -56,17 +56,36 @@ import openfl.utils.Assets as OpenFLAssets;
 	static inline function first<T>(list:Array<T>, ?toFind:T):T {
 		if (toFind != null)
 			return list.filter(e -> e == toFind).shift();
-		else
+		else if (list.length > 0)
 			return list[0];
+
+		return null;
 	}
 
 	static inline function last<T>(list:Array<T>, ?toFind:T):T {
 		if (toFind != null)
 			return list.filter(e -> e == toFind).pop();
-		else
+		else if (list.length > 0)
 			return list[list.length-1];
+
+		return null;
 	}
 
+	static function startsWithAny(str:String, starts:Array<String>) {
+		for (start in starts) {
+			if (str.startsWith(start))
+				return true;
+		}
+		return false;
+	}
+
+	static function endsWithAny(str:String, ends:Array<String>) {
+		for (end in ends) {
+			if (str.endsWith(end))
+				return true;
+		}
+		return false;
+	}
 
 	static function sum(...tally:Float) {
 		var result:Float = 0;

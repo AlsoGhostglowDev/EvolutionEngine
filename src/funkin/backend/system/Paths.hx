@@ -75,46 +75,48 @@ import funkin.backend.system.Mods;
 	}
 
 	static function getPath(path:String, ?ignoreMods:Bool = false, ?extensions:Array<String>, ?includeDir:Array<String>):Null<String> {
-		if (extensions != null)
-			for (i => ext in extensions) {
-				if (!ext.startsWith('.'))
-					extensions[i] = '.$ext';
+		if (path != null) {
+			if (extensions != null)
+				for (i => ext in extensions) {
+					if (!ext.startsWith('.'))
+						extensions[i] = '.$ext';
+				}
+
+			extensions ??= [''];
+			if (includeDir == null) {
+				includeDir ??= [ // sort in order of hierarchy
+					#if MODS_ALLOWED '${Flags.MODS_FOLDER}/${Mods.currentModDirectory}', #end 
+					'assets/shared', 'assets'
+				];
+				if (#if MODS_ALLOWED ignoreMods #else true #end) includeDir.shift();
 			}
 
-		extensions ??= [''];
-		if (includeDir == null) {
-			includeDir ??= [ // sort in order of hierarchy
-				#if MODS_ALLOWED '${Flags.MODS_FOLDER}/${Mods.currentModDirectory}', #end 
-				'assets/shared', 'assets'
-			];
-			if (#if MODS_ALLOWED ignoreMods #else true #end) includeDir.shift();
-		}
-
-		// Me when haxe.io.Path.normalize -TBar
-		while (path.startsWith('../')) {
-			for (i => dir in includeDir) {
-				var ret = dir.split('/');
-				if (ret.length > 1) {
-					ret.shift(); 
-					includeDir[i] = ret.join('/');
-				} else
-					includeDir[i] = ''; // root
+			// Me when haxe.io.Path.normalize -TBar
+			while (path.startsWith('../')) {
+				for (i => dir in includeDir) {
+					var ret = dir.split('/');
+					if (ret.length > 1) {
+						ret.shift(); 
+						includeDir[i] = ret.join('/');
+					} else
+						includeDir[i] = ''; // root
+				}
+				var splPath = path.split('/');
+				splPath.shift();
+				path = splPath.join('/'); 
 			}
-			var splPath = path.split('/');
-			splPath.shift();
-			path = splPath.join('/'); 
-		}
 
-		for (dir in includeDir) {
-			for (ext in extensions) {
-				final trackedPath = '$dir/$path$ext';
-				if (FileUtil.exists(trackedPath)) {
-					trace('Path found!: $trackedPath');
-					return trackedPath;
+			for (dir in includeDir) {
+				for (ext in extensions) {
+					final trackedPath = '$dir/$path$ext';
+					if (FileUtil.exists(trackedPath)) {
+						trace('Path found!: $trackedPath');
+						return trackedPath;
+					}
 				}
 			}
+			trace('Path not found for: $path');
 		}
-		trace('Path not found for: $path');
 		return null;
 	}
 }

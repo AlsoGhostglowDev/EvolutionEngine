@@ -1,52 +1,55 @@
 package funkin.backend.system;
 
+import funkin.game.SongData.ChartNote;
+import funkin.game.SongData.Player;
+import funkin.game.SongData.PsychSection;
+import funkin.game.SongData.PsychSong;
+import funkin.game.SongData.Song;
+import funkin.game.SongData;
 import funkin.game.objects.Character.AnimationData;
 import funkin.game.objects.Character.CharacterData;
 import funkin.game.objects.Character.CodenameAnimationData;
 import funkin.game.objects.Character.CodenameCharacter;
 import funkin.game.objects.Character.PsychAnimationData;
 import funkin.game.objects.Character.PsychCharacter;
-
-import funkin.game.SongData;
-import funkin.game.SongData.Song;
-import funkin.game.SongData.ChartNote;
-import funkin.game.SongData.Player;
-import funkin.game.SongData.PsychSong;
-import funkin.game.SongData.PsychSection;
-
 import tjson.TJSON;
 #if sys
 import sys.io.File;
 #end
 
-enum EngineType {
+enum EngineType
+{
 	EVOLUTION;
 	CODENAME;
 	PSYCH;
 	UNKNOWN;
 }
 
-enum ChartEngineType {
-    EVOLUTION;
-    CODENAME;
-    PSYCH;
-    PSYCH_LEGACY;
-    VSLICE;
+enum ChartEngineType
+{
+	EVOLUTION;
+	CODENAME;
+	PSYCH;
+	PSYCH_LEGACY;
+	VSLICE;
 	UNKNOWN;
 }
 
 // ts so ahh 🥀
 
 @:access(funkin.game.objects.Character)
-@:access(funkin.game.objects.Stage)
 @:access(funkin.states.debug.ChartEditor)
 @:access(funkin.game.SongData)
+@:access(funkin.game.Stage)
 @:publicFields class Parser
 {
-	static function chart(content:String, ?from:ChartEngineType = EVOLUTION, ?to:ChartEngineType = EVOLUTION):Dynamic {
-		switch (to) {
+	static function chart(content:String, ?from:ChartEngineType = EVOLUTION, ?to:ChartEngineType = EVOLUTION):Dynamic
+	{
+		switch (to)
+		{
 			case EVOLUTION:
-				switch (from) {
+				switch (from)
+				{
 					case EVOLUTION:
 						var data:Song = TJSON.parse(content);
 						return data;
@@ -54,23 +57,25 @@ enum ChartEngineType {
 						// wip
 						return {};
 					case PSYCH:
-						var unsafeJson = TJSON.parse(content); 
+						var unsafeJson = TJSON.parse(content);
 						var chartJson:PsychSong = unsafeJson;
 						if (Reflect.hasField(unsafeJson, 'song')) // check for legacy
 							chartJson = chart(content, PSYCH_LEGACY);
 
 						var data:PsychSong = chartJson;
 						var characters:Array<Player> = [
-							{ name: data.player1,   isPlayer: true,  isSpeaker: false },
-							{ name: data.player2,   isPlayer: false, isSpeaker: false },
-							{ name: data.gfVersion, isPlayer: false, isSpeaker: true  }
+							{name: data.player1, isPlayer: true, isBopper: false},
+							{name: data.player2, isPlayer: false, isBopper: false},
+							{name: data.gfVersion, isPlayer: false, isBopper: true}
 						];
 
 						var notes:Array<ChartNote> = [];
-						for (section in data.notes) {
+						for (section in data.notes)
+						{
 							final gfSec = section.gfSection;
 							final mustHit = section.mustHitSection;
-							for (secNote in section.sectionNotes) {
+							for (secNote in section.sectionNotes)
+							{
 								final strumTime = secNote[0];
 								final noteData = secNote[1];
 								final susLen = secNote[2];
@@ -89,7 +94,7 @@ enum ChartEngineType {
 
 								notes.push(note);
 							}
-						} 
+						}
 
 						var returnData:Song = {
 							characters: characters,
@@ -106,9 +111,12 @@ enum ChartEngineType {
 						return returnData;
 					case PSYCH_LEGACY:
 						var data:PsychSong = TJSON.parse(content).song;
-						for (section in data.notes) {
-							if (section.sectionNotes != null && section.sectionNotes?.length ?? 0 > 0 && section.mustHitSection) {
-								for (note in section.sectionNotes) {
+						for (section in data.notes)
+						{
+							if (section.sectionNotes != null && section.sectionNotes?.length ?? 0 > 0 && section.mustHitSection)
+							{
+								for (note in section.sectionNotes)
+								{
 									if (note[1] > 3) // noteData
 										note[1] = note[1] % 4;
 									else
@@ -133,8 +141,9 @@ enum ChartEngineType {
 				return chart(content, from, PSYCH);
 			case VSLICE:
 				// wip
-				return {};	
-			case UNKNOWN: return {};	
+				return {};
+			case UNKNOWN:
+				return {};
 		}
 	}
 
@@ -189,25 +198,24 @@ enum ChartEngineType {
 			case PSYCH:
 				// wip
 				return {};
-			case UNKNOWN: return {};
+			case UNKNOWN:
+				return {};
 		}
 	}
 
 	static function saveJson(path:String, content:Dynamic, ?absolute:Bool = false):String
 	{
-		#if sys
-		try {
-			if (Paths.exists('$path.json', absolute)) {
-				final jsonContent = haxe.Json.stringify(content, '\t');
+		final jsonContent = haxe.Json.stringify(content, '\t');
+		try
+		{
+			if (Paths.exists('$path.json', absolute))
 				FileUtil.saveContent(Paths.getPath('$path.json'), jsonContent);
-				return jsonContent;
-			} else
+			else
 				throw 'saveJson: Path "$path.json" doesn\'t exist!';
-		} catch(e) {
-			trace('error: ${Std.string(e)}');
 		}
-		#end
-		return '';
+		catch (e)
+			trace('error: ${Std.string(e)}');
+		return jsonContent;
 	}
 
 	static function buildXML(data:Dynamic) {}

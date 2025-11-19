@@ -58,14 +58,14 @@ enum ChartEngineType
 					case PSYCH:
 						var unsafeJson = TJSON.parse(content);
 						var chartJson:PsychSong = unsafeJson;
-						if (Reflect.hasField(unsafeJson, 'song')) // check for legacy
+						if (Reflect.hasField(unsafeJson, 'song') && !(unsafeJson.song is String)) // check for legacy
 							chartJson = chart(content, PSYCH_LEGACY);
 
 						var data:PsychSong = chartJson;
 						var characters:Array<Player> = [
-							{name: data.player1, isPlayer: true, isBopper: false},
-							{name: data.player2, isPlayer: false, isBopper: false},
-							{name: data.gfVersion, isPlayer: false, isBopper: true}
+							{name: data.player2, isPlayer: false, isBopper: false}, // dad
+							{name: data.player1, isPlayer: true, isBopper: false},  // bf
+							{name: data.gfVersion, isPlayer: false, isBopper: true} // gf
 						];
 
 						var notes:Array<ChartNote> = [];
@@ -110,16 +110,18 @@ enum ChartEngineType
 						return returnData;
 					case PSYCH_LEGACY:
 						var data:PsychSong = TJSON.parse(content).song;
-						for (section in data.notes)
-						{
-							if (section.sectionNotes != null && section.sectionNotes?.length ?? 0 > 0 && section.mustHitSection)
+						if (Reflect.hasField(data, 'notes')) {
+							for (section in data.notes)
 							{
-								for (note in section.sectionNotes)
+								if (section.sectionNotes != null && section.sectionNotes?.length ?? 0 > 0 && section.mustHitSection)
 								{
-									if (note[1] > 3) // noteData
-										note[1] = note[1] % 4;
-									else
-										note[1] += 4;
+									for (note in section.sectionNotes)
+									{
+										if (note[1] > 3) // noteData
+											note[1] = note[1] % 4;
+										else
+											note[1] += 4;
+									}
 								}
 							}
 						}

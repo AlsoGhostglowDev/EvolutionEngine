@@ -8,25 +8,25 @@ import funkin.backend.system.Mods;
 	inline static function image(key:String, ?showError:Bool):String
 		return getPath('images/$key.${Flags.IMAGE_EXT}', null, null, null, showError);
 
-	inline static function xml(key:String):String
-		return getPath('$key.xml');
+	inline static function xml(key:String, ?showError:Bool):String
+		return getPath('$key.xml', null, null, null, showError);
 
-	inline static function json(key:String, ?library:String = 'data') {
+	inline static function json(key:String, ?library:String = 'data', ?showError:Bool) {
 		if (!library.endsWith('/')) library += '/';
-		return getPath('$library$key.json');
+		return getPath('$library$key.json', null, null, null, showError);
 	}
 
-	inline static function sparrow(key:String):String
-		return xml('images/$key');
+	inline static function sparrow(key:String, ?showError:Bool):String
+		return xml('images/$key', showError);
 
-	inline static function sparrowExists(key:String):Bool
-		return sparrow(key) != null;
+	inline static function sparrowExists(key:String, ?showError:Bool):Bool
+		return sparrow(key, showError) != null;
 
-	inline static function sound(key:String):String
-		return getPath('sounds/$key.${Flags.SOUND_EXT}');
+	inline static function sound(key:String, ?showError:Bool):String
+		return getPath('sounds/$key.${Flags.SOUND_EXT}', null, null, null, showError);
 
-	inline static function music(key:String):String
-		return getPath('music/$key.${Flags.MUSIC_EXT}');
+	inline static function music(key:String, ?showError:Bool):String
+		return getPath('music/$key.${Flags.MUSIC_EXT}', null, null, null, showError);
 
 	inline static function inst(key:String, ?postfix:String = '', ?showError:Bool):String {
 		final prePath:String = song(key);
@@ -44,14 +44,14 @@ import funkin.backend.system.Mods;
 		return null;
 	}
 
-	inline static function chart(key:String, ?difficulty:String = 'normal')
-		return getPath('songs/$key/charts/$difficulty', false, Flags.CHART_EXT);
+	inline static function chart(key:String, ?difficulty:String = 'normal', ?showError:Bool)
+		return getPath('songs/$key/charts/$difficulty', false, Flags.CHART_EXT, null, showError);
 
-	inline static function character(key:String):String
-		return getPath('data/characters/$key', false, Flags.CHAR_EXT);
+	inline static function character(key:String, ?showError:Bool):String
+		return getPath('data/characters/$key', false, Flags.CHAR_EXT, null, showError);
 
-	inline static function stage(key:String):String
-		return json(key, 'data/stages');
+	inline static function stage(key:String, ?showError:Bool):String
+		return json(key, 'data/stages', showError);
 
 	inline static function exists(key:String, ?absolute:Bool = false, 
 		?ignoreMods:Bool, ?extensions:Array<String>, ?showError:Bool = false):Bool {
@@ -62,19 +62,19 @@ import funkin.backend.system.Mods;
 
 	// For scripts
 	#if HSCRIPT_ALLOWED
-	static function hscript(key:String, ?library:String = "scripts"):String {
+	static function hscript(key:String, ?library:String = "scripts", ?showError:Bool):String {
 		if (!library.endsWith('/')) library += '/';
-		return getPath('$library$key', false, Flags.HSCRIPT_EXT);
+		return getPath('$library$key', false, Flags.HSCRIPT_EXT, null, showError);
 	}
 	#end
 	#if LUA_ALLOWED
-	static function lua(key:String, ?library:String = "scripts"):String {
+	static function lua(key:String, ?library:String = "scripts", ?showError:Bool):String {
 		if (!library.endsWith('/')) library += '/';
-		return getPath('$library$key', false, Flags.LUA_EXT);
+		return getPath('$library$key', false, Flags.LUA_EXT, null, showError);
 	}
 	#end
 
-	static function song(key:String, ?returnAbsolute:Bool = false):String {
+	static function song(key:String, ?returnAbsolute:Bool = false, ?showError:Bool):String {
 		var curPath:String = 'songs/$key'; 
 		var path:String = null;
 
@@ -85,7 +85,7 @@ import funkin.backend.system.Mods;
 		else if (Paths.exists(curPath = 'songs/${key.replace(' ', '-')}'))
 			path = curPath;
 
-		return returnAbsolute ? getPath(path) : path;
+		return returnAbsolute ? getPath(path, null, null, null, showError) : path;
 	}
 
 	static function getPath(path:String, ?ignoreMods:Bool = false, ?extensions:Array<String>, ?includeDir:Array<String>, ?showError:Bool):Null<String> {
@@ -130,8 +130,6 @@ import funkin.backend.system.Mods;
 					// uncomment for a more detailed debug
 					// trace('[$i:$j] trackedPath: ${trackedPath} | [$dir | $path | ${ext == '' ? 'no-ext' : ext}] (${FileUtil.exists(trackedPath) ? 'success' : 'failed'})');
 					if (FileUtil.exists(trackedPath)) {
-						if (showError)
-							trace('Path found!: $trackedPath');
 						return trackedPath;
 					}
 				}

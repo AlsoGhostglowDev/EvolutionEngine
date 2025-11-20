@@ -77,9 +77,9 @@ class Note extends FunkinSprite
 
 		texture ??= FALLBACK_TEXTURE;
 		if (isPixel)
-			loadGraphic(Paths.image('noteskins/$texture'), true, pixelMeta.frameWidth, pixelMeta.frameHeight);
+			loadGraphic(Paths.image('noteskins/$texture', false), true, pixelMeta.frameWidth, pixelMeta.frameHeight);
 		else
-			tryLoadFrames(this, 'noteskins/$texture');
+			tryLoadFrames(this, 'noteskins/$texture', false);
 
 		return texture;
 	}
@@ -170,7 +170,7 @@ class Note extends FunkinSprite
 					var hasTypo = attemptAddAnimationByPrefix(this, 'purpleholdend', 'pruple hold end', 24, true);
 					if (hasTypo)
 					{
-						final xmlPath = Paths.sparrow('noteskins/$texture');
+						final xmlPath = Paths.sparrow('noteskins/$texture', false);
 						FileUtil.saveContent(xmlPath, FileUtil.getContent(xmlPath).replace('pruple', 'purple'));
 					}
 				}

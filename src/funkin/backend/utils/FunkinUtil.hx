@@ -13,22 +13,22 @@ import openfl.utils.Assets as OpenFLAssets;
 	static inline function getLerpRatio(ratio:Float, ?elapsed:Float)
 		return 1.0 - Math.pow(1.0 - ratio, (elapsed ?? FlxG.elapsed) * 60);
 
-	static inline function loadSparrowAtlas(path:String)
+	static inline function loadSparrowAtlas(path:String, ?showError:Bool)
 	{
-		var graphic = FlxGraphic.fromAssetKey(Paths.image(path));
-		return FlxAtlasFrames.fromSparrow(graphic, Paths.sparrow(path));
+		var graphic = FlxGraphic.fromAssetKey(Paths.image(path, showError));
+		return FlxAtlasFrames.fromSparrow(graphic, Paths.sparrow(path, showError));
 	}
 
 	/*
 		Tries and load animated frames if there is an XML detected,
 		else it'll fallback to a normal inanimated sprite.
 	 */
-	static function tryLoadFrames(sprite:FlxSprite, path:String)
+	static function tryLoadFrames(sprite:FlxSprite, path:String, ?showError:Bool)
 	{
 		if (Paths.sparrowExists(path))
-			sprite.frames = loadSparrowAtlas(path);
+			sprite.frames = loadSparrowAtlas(path, showError);
 		else
-			sprite.loadGraphic(Paths.image(path));
+			sprite.loadGraphic(Paths.image(path, showError));
 	}
 
 	static inline function loadSound(path:String)

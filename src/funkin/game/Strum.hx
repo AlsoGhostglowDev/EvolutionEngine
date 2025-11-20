@@ -26,16 +26,16 @@ class Strum extends FunkinSprite
 			path.replace('noteskins/', '');
 
 		texture = null;
-		if (Paths.exists('images/noteskins/$path.png'))
+		if (Paths.exists('images/noteskins/$path.png', false))
 			texture = path;
 		else
 			trace('set_texture: Texture with path "images/noteskins/$path" not found!');
 
 		texture ??= FALLBACK_TEXTURE;
 		if (isPixel)
-			loadGraphic(Paths.image('noteskins/$texture'), true, pixelMeta.frameWidth, pixelMeta.frameHeight);
+			loadGraphic(Paths.image('noteskins/$texture', false), true, pixelMeta.frameWidth, pixelMeta.frameHeight);
 		else
-			tryLoadFrames(this, 'noteskins/$texture');
+			tryLoadFrames(this, 'noteskins/$texture', false);
 
 		return texture;
 	}

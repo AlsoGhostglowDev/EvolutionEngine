@@ -73,7 +73,8 @@ class Stage extends FlxSpriteGroup implements IBeatListener
 			final sourceData = Paths.stage(path);
 			final stageEngine = justifyEngine(sourceData);
 			trace([sourceData, stageEngine]);
-			data = Parser.stage(FileUtil.getContent(sourceData), stageEngine);
+			if (sourceData != null)
+				data = Parser.stage(FileUtil.getContent(sourceData), stageEngine);
 		}
 
 		data ??= {

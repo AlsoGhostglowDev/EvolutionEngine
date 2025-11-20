@@ -1050,6 +1050,8 @@ class Parser {
 						switch( t ) {
 							case TId(id):
 								path.push(id);
+							case TOp("*"):
+								path.push("*");
 							default:
 								unexpected(t);
 						}

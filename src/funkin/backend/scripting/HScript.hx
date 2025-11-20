@@ -1,5 +1,6 @@
 package funkin.backend.scripting;
 
+import funkin.backend.utils.ScriptUtil;
 import funkin.backend.macros.Compiler;
 #if HSCRIPT_ALLOWED
 import hscript.Expr.Error as HScriptError;
@@ -19,7 +20,7 @@ class HScript extends Script {
 		"Int" => Int, "Float" => Float,
 		"String" => String, "Bool" => Bool,
 		"StringMap" => haxe.ds.StringMap, "IntMap" => haxe.ds.IntMap,
-		"Map" => resolveAbstract("haxe.ds.Map"),
+		"Map" => ScriptUtil.resolveAbstract("haxe.ds.Map"),
 
 		//Base level haxe classes
 		"Math" => Math, "Std" => Std,
@@ -53,8 +54,8 @@ class HScript extends Script {
 		"FlxTypedGroup" => flixel.group.FlxGroup.FlxTypedGroup,
 		"FlxSpriteGroup" => flixel.group.FlxSpriteGroup,
 
-		"FlxAxes" => resolveAbstract("flixel.util.FlxAxes"),
-		"FlxColor" => resolveAbstract("flixel.util.FlxColor")
+		"FlxAxes" => ScriptUtil.resolveAbstract("flixel.util.FlxAxes"),
+		"FlxColor" => ScriptUtil.resolveAbstract("flixel.util.FlxColor")
 	];
 
 	public var parser:HScriptParser;
@@ -73,7 +74,7 @@ class HScript extends Script {
 		if(parser == null) initParser();
 		if(interp == null) initInterp();
 
-		options ??= {ignoreErrors: false};
+		options ??= {ignoreErrors: false, isString: false};
 		try
 		{
 			parser.line = 1; // Reset the parser position.
@@ -113,6 +114,35 @@ class HScript extends Script {
 
 		interp.errorHandler = onError;
 		interp.warnHandler = onWarn;
+		interp.importFailedCallback = onImportFailed;
+	}
+
+	public var allowWildcardImports:Bool = true;
+	public function onImportFailed(clsPath:Array<String>, aliasAs:String):Bool {
+		if(allowWildcardImports && clsPath[clsPath.length-1] == "*") {
+
+			// Wildcard class imports, like `import funkin.backend.utils.FunkinUtil.*`
+			var __clsCopy:Array<String> = clsPath.copy();
+			__clsCopy.pop();
+			var clsInst = ScriptUtil.importResolve(__clsCopy.join("."));
+			if(clsInst != null) {
+				for (field in Type.getClassFields(clsInst)) {
+					this.interp.variables.set(field, Reflect.field(clsInst, field));
+				}
+				return true;
+			}
+
+			// If all else fails, does a regular wildcard import (VERY SLOW)
+			@:privateAccess
+			var varsToImport:Array<String> = ScriptUtil.wildcardImport(clsPath.join("."));
+			if(varsToImport != null && varsToImport.length > 0) {
+				for (item in varsToImport) {
+					this.interp.variables.set(ScriptUtil.getClassName(item), ScriptUtil.importResolve(item));
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function onError(e:HScriptError) {

@@ -109,16 +109,4 @@ import openfl.utils.Assets as OpenFLAssets;
 
 	static function average(...tally:Float)
 		return sum(...tally) / tally.length;
-
-	/* HScript stuff */
-	@:noUsing static inline function resolveAbstract(abs:String):Null<Dynamic>
-	{
-		return Type.resolveClass('${abs}_HSC');
-	}
-
-	// Not normally used, but a fun tool to have
-	@:noUsing static inline function resolveExtendClass(ext:String):Null<Dynamic>
-	{
-		return Type.resolveClass('${ext}_HSX');
-	}
 }

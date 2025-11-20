@@ -2,7 +2,7 @@ package funkin.objects;
 
 import flixel.system.FlxAssets.FlxGraphicAsset;
 
-class LogoBumpin extends FlxSprite
+class LogoBumpin extends FunkinSprite
 {
 	public var idleAnimation(default, set):String;
 

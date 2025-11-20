@@ -1,9 +1,9 @@
 package funkin.states.debug;
 
 import flixel.input.keyboard.FlxKey;
-import funkin.game.SongData;
-import funkin.game.objects.Character;
+import funkin.game.Character;
 import funkin.objects.LogoBumpin;
+import funkin.game.system.SongData;
 
 class TestingGrounds extends DebugState
 {

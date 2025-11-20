@@ -1,6 +1,6 @@
 package funkin.states;
 
-import funkin.game.objects.Character;
+import funkin.game.Character;
 import funkin.objects.LogoBumpin;
 
 class MainMenuState extends SelectableState
@@ -13,7 +13,7 @@ class MainMenuState extends SelectableState
 	{
 		super(0, 4);
 
-		var bg = new FlxSprite();
+		var bg = new FunkinSprite();
 		bg.loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xFFF9DB69;
 		add(bg);
@@ -39,4 +39,4 @@ class MainMenuState extends SelectableState
 	}
 }
 
-class MenuButton extends FlxSprite {}
+class MenuButton extends FunkinSprite {}

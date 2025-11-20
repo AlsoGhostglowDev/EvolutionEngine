@@ -1,7 +1,7 @@
 package funkin.backend;
 
 import funkin.backend.input.Controls;
-import funkin.game.objects.Character;
+import funkin.game.Character;
 import funkin.states.*;
 
 typedef BeatHitSignal = FlxTypedSignal<Int->Void>;

@@ -73,6 +73,7 @@ class HScript extends Script {
 		if(parser == null) initParser();
 		if(interp == null) initInterp();
 
+		options ??= {ignoreErrors: false};
 		try
 		{
 			parser.line = 1; // Reset the parser position.
@@ -88,8 +89,10 @@ class HScript extends Script {
 			interp.execute(expr);
 			call("new");
 		} catch(e) {
-			if (options.ignoreErrors != null && !options.ignoreErrors)
-				FlxG.stage.window.alert('Error on haxe script "${this.path}".\n${e.toString()}', 'HScript Error!');
+			if (options.ignoreErrors != null) 
+				if (!options.ignoreErrors) {
+					FlxG.stage.window.alert('Error on haxe script "${this.path}".\n${e.toString()}', 'HScript Error!');
+			}
 		}
 	}
 

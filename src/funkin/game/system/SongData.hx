@@ -1,4 +1,4 @@
-package funkin.game;
+package funkin.game.system;
 
 import funkin.backend.system.Parser;
 import tjson.TJSON;
@@ -7,7 +7,8 @@ typedef Player =
 {
 	name:String,
 	isPlayer:Bool,
-	?isBopper:Bool
+	?isBopper:Bool,
+	?hideStrumline:Bool
 }
 
 typedef ChartNote =

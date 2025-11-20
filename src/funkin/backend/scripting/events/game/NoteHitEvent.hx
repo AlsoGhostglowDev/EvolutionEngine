@@ -1,10 +1,11 @@
 package funkin.backend.scripting.events.game;
 
-import funkin.game.objects.Note;
-import funkin.game.objects.Strum;
-import funkin.game.objects.Character;
+import funkin.game.Character;
+import funkin.game.Note;
+import funkin.game.Strum;
 
-class NoteHitEvent extends CancellableEvent {
+class NoteHitEvent extends CancellableEvent
+{
 	public var note:Note;
 
 	public var strumTime:Float;
@@ -15,7 +16,8 @@ class NoteHitEvent extends CancellableEvent {
 	public var strum:Strum;
 	public var cpu:Bool;
 
-	public function new(note:Note) {
+	public function new(note:Note)
+	{
 		super();
 
 		this.note = note;

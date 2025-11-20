@@ -11,6 +11,11 @@ import funkin.backend.system.Mods;
 	inline static function xml(key:String):String
 		return getPath('$key.xml');
 
+	inline static function json(key:String, ?library:String = 'data') {
+		if (!library.endsWith('/')) library += '/';
+		return getPath('$library$key.json');
+	}
+
 	inline static function sparrow(key:String):String
 		return xml('images/$key');
 
@@ -45,6 +50,9 @@ import funkin.backend.system.Mods;
 	inline static function character(key:String):String
 		return getPath('data/characters/$key', false, Flags.CHAR_EXT);
 
+	inline static function stage(key:String):String
+		return json(key, 'data/stages');
+
 	inline static function exists(key:String, ?absolute:Bool = false, 
 		?ignoreMods:Bool, ?extensions:Array<String>, ?showError:Bool = false):Bool {
 
@@ -54,13 +62,15 @@ import funkin.backend.system.Mods;
 
 	// For scripts
 	#if HSCRIPT_ALLOWED
-	static function hscript(key:String, ?folder:String = "scripts"):String {
-		return getPath('$folder/$key', false, Flags.HSCRIPT_EXT);
+	static function hscript(key:String, ?library:String = "scripts"):String {
+		if (!library.endsWith('/')) library += '/';
+		return getPath('$library$key', false, Flags.HSCRIPT_EXT);
 	}
 	#end
 	#if LUA_ALLOWED
-	static function lua(key:String, ?folder:String = "scripts"):String {
-		return getPath('$folder/$key', false, Flags.LUA_EXT);
+	static function lua(key:String, ?library:String = "scripts"):String {
+		if (!library.endsWith('/')) library += '/';
+		return getPath('$library$key', false, Flags.LUA_EXT);
 	}
 	#end
 

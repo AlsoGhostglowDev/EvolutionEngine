@@ -1,4 +1,4 @@
-package funkin.game.objects.hud;
+package funkin.game.hud;
 
 @:access(funkin.game.objects.hud.Note)
 class NoteGroup extends FlxTypedSpriteGroup<Note>

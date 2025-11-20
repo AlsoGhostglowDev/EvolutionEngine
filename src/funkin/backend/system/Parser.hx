@@ -1,17 +1,18 @@
 package funkin.backend.system;
 
-import funkin.game.SongData.ChartNote;
-import funkin.game.SongData.Player;
-import funkin.game.SongData.PsychSection;
-import funkin.game.SongData.PsychSong;
-import funkin.game.SongData.Song;
-import funkin.game.SongData;
-import funkin.game.objects.Character.AnimationData;
-import funkin.game.objects.Character.CharacterData;
-import funkin.game.objects.Character.CodenameAnimationData;
-import funkin.game.objects.Character.CodenameCharacter;
-import funkin.game.objects.Character.PsychAnimationData;
-import funkin.game.objects.Character.PsychCharacter;
+import funkin.game.Character.AnimationData;
+import funkin.game.Character.CharacterData;
+import funkin.game.Character.CodenameAnimationData;
+import funkin.game.Character.CodenameCharacter;
+import funkin.game.Character.PsychAnimationData;
+import funkin.game.Character.PsychCharacter;
+import funkin.game.system.SongData.ChartNote;
+import funkin.game.system.SongData.Player;
+import funkin.game.system.SongData.PsychSection;
+import funkin.game.system.SongData.PsychSong;
+import funkin.game.system.SongData.Song;
+import funkin.game.system.SongData;
+import funkin.game.Stage.StageData;
 import tjson.TJSON;
 #if sys
 import sys.io.File;
@@ -36,9 +37,10 @@ enum ChartEngineType
 }
 
 // ts so ahh 🥀
+
 @:access(funkin.game.objects.Character)
 @:access(funkin.states.debug.ChartEditor)
-@:access(funkin.game.SongData)
+@:access(funkin.game.system.SongData)
 @:access(funkin.game.Stage)
 @:publicFields class Parser
 {
@@ -63,9 +65,9 @@ enum ChartEngineType
 
 						var data:PsychSong = chartJson;
 						var characters:Array<Player> = [
-							{name: data.player2, isPlayer: false, isBopper: false}, // dad
-							{name: data.player1, isPlayer: true, isBopper: false},  // bf
-							{name: data.gfVersion, isPlayer: false, isBopper: true} // gf
+							{ name: data.player2,   isPlayer: false, isBopper: false, hideStrumline: false }, // dad
+							{ name: data.player1,   isPlayer: true,  isBopper: false, hideStrumline: false }, // bf
+							{ name: data.gfVersion, isPlayer: false, isBopper: true,  hideStrumline: true  } // gf
 						];
 
 						var notes:Array<ChartNote> = [];
@@ -110,7 +112,8 @@ enum ChartEngineType
 						return returnData;
 					case PSYCH_LEGACY:
 						var data:PsychSong = TJSON.parse(content).song;
-						if (Reflect.hasField(data, 'notes')) {
+						if (Reflect.hasField(data, 'notes'))
+						{
 							for (section in data.notes)
 							{
 								if (section.sectionNotes != null && section.sectionNotes?.length ?? 0 > 0 && section.mustHitSection)
@@ -134,17 +137,17 @@ enum ChartEngineType
 				}
 			case CODENAME:
 				// wip
-				return {};
+				return null;
 			case PSYCH:
 				// wip
-				return {};
+				return null;
 			case PSYCH_LEGACY:
 				return chart(content, from, PSYCH);
 			case VSLICE:
 				// wip
-				return {};
+				return null;
 			case UNKNOWN:
-				return {};
+				return null;
 		}
 	}
 
@@ -195,12 +198,40 @@ enum ChartEngineType
 				}
 			case CODENAME:
 				// wip
-				return {};
+				return null;
 			case PSYCH:
 				// wip
-				return {};
+				return null;
 			case UNKNOWN:
-				return {};
+				return null;
+		}
+		return null;
+	}
+
+	static function stage(content:String, ?from:EngineType = EVOLUTION, ?to:EngineType = EVOLUTION):Dynamic {
+		switch(from) {
+			case EVOLUTION:
+				switch(to) {
+					case EVOLUTION:
+						var data:StageData = TJSON.parse(content);
+						return data;
+					case CODENAME:
+						// wip
+						return null;
+					case PSYCH:
+						// wip
+						return null;
+					case UNKNOWN:
+						return null;
+				}
+			case CODENAME:
+				// wip
+				return null;
+			case PSYCH:
+				// wip
+				return null;
+			case UNKNOWN:
+				return null;
 		}
 	}
 

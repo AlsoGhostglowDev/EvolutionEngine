@@ -1,4 +1,4 @@
-package funkin.game.objects;
+package funkin.game;
 
 import flixel.math.FlxPoint;
 import funkin.backend.system.Parser;
@@ -93,6 +93,7 @@ class Character extends FlxSprite implements IBeatListener {
 	public var icon(default, null):String;
 	public var isPlayer(default, set):Bool = false;
 
+	public var hideStrumline:Bool = false; // for playstate
 	public var allowSing:Bool = false; // for playstate
 	public var stunned:Bool = false;
 	public var danceBeatInterval:Int = 2;

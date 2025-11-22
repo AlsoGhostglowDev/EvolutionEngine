@@ -154,11 +154,12 @@ class Strum extends FunkinSprite
 		if (anim == 'static' || anim == 'confirm' || anim == 'press')
 			anim += directionList[noteData];
 
-		if ((allowStatic && _anim == 'static') || _anim != 'static')
+		if ((allowStatic && _anim == 'static') || _anim != 'static') {
 			animation.play(anim, forced);
 
-		centerOrigin();
-		centerOffsets();
+			centerOrigin();
+			centerOffsets();
+		}
 	}
 
 	public function playStatic() {

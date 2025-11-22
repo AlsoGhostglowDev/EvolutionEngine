@@ -47,9 +47,8 @@ class HUD extends FlxSpriteGroup implements IBeatListener {
 			notes.add(leNote);
 			add(leNote);
 
-			leNote.get_canBeHit = function() {
+			leNote.get_canBeHit = function()
 				return Math.abs(Conductor.songPosition - leNote.strumTime) <= 188;
-			}
 		}
 	}
 

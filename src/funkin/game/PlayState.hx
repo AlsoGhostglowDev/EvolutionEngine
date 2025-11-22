@@ -1,5 +1,6 @@
 package funkin.game;
 
+import flixel.FlxObject;
 import funkin.game.*;
 import funkin.game.system.*;
 import funkin.game.system.SongData.Player;
@@ -46,7 +47,7 @@ class PlayState extends ScriptableState
 
 	public var camGame:FunkinCamera;
 	public var camHUD:FunkinCamera;
-	public var camFollow:FlxPoint;
+	public var camFollow:FlxObject;
 	public var hud:HUD;
 
 	public var inst:FlxSound;
@@ -95,6 +96,9 @@ class PlayState extends ScriptableState
 		camGame = new FunkinCamera();
 		FlxG.cameras.add(camGame);
 		FlxG.camera = camGame;
+
+		camFollow = new FlxObject();
+		camGame.follow(camFollow, LOCKON, 0.083);
 
 		camHUD = new FunkinCamera();
 		camHUD.bgColor.alpha = 0;

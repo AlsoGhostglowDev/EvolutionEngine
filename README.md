@@ -1,4 +1,6 @@
 # Evolution Engine
+![banner](evo.png)
+
 a Friday Night Funkin' engine that is reworked from the ground up. <br>
 This engine's goal is to push softcoding capabilities without limits. It's performance is questionable but we will try to make it the best experience we could.
 

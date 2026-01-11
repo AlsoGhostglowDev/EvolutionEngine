@@ -19,29 +19,32 @@ class ScriptableStage extends Stage implements IScriptable
 		super(stage);
 
 		#if HSCRIPT_ALLOWED
-		if (Paths.exists(Paths.hscript(stage, 'data/stages')))
+		//if (Paths.exists(Paths.hscript(stage, 'data/stages'), true))
+		if (Paths.hscript(stage, 'data/stages') != null)
+		{
 			hscript = new HScript(Paths.hscript(stage, 'data/stages'), {parent: MusicBeatState.getState(), ignoreErrors: false});
+		}
 		#end
 	}
 
 	public function call(func:String, ?args:Array<Dynamic>) {
 		#if HSCRIPT_ALLOWED
-		if (hscript != null)
-			hscript.call(func, args ?? []);
+		hscript?.call(func, args ?? []);
 		#end
 	}
 
 	public function set(field:String, value:Dynamic) {
 		#if HSCRIPT_ALLOWED
-		if (hscript != null)
-			hscript.set(field, value);
+		hscript?.set(field, value);
 		#end
 	}
 
 	override function destroy() {
 		#if HSCRIPT_ALLOWED
-		if (hscript != null)
+		if(hscript != null) {
 			hscript.destroy();
+			hscript = null;
+		}
 		#end
 
 		super.destroy();

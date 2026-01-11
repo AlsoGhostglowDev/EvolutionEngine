@@ -1,5 +1,9 @@
 package funkin.backend.system;
 
+import funkin.game.Stage.StageData;
+import funkin.game.Stage.PsychStageData;
+import funkin.game.Stage.StageCharacter;
+
 import funkin.game.Character.AnimationData;
 import funkin.game.Character.CharacterData;
 import funkin.game.Character.CodenameAnimationData;
@@ -14,7 +18,6 @@ import funkin.game.system.SongData.PsychSection;
 import funkin.game.system.SongData.PsychSong;
 import funkin.game.system.SongData.Song;
 import funkin.game.system.SongData;
-import funkin.game.Stage.StageData;
 import tjson.TJSON;
 #if sys
 import sys.io.File;
@@ -244,13 +247,13 @@ enum ChartEngineType
 			case EVOLUTION:
 				switch (from)
 				{
-					case EVOLUTION:
+					case EVOLUTION: // Evolution to Evolution
 						var data = unsafeJson;
 						return data;
-					case CODENAME:
+					case CODENAME: // CNE to Evolution
 						// wip
 						return {};
-					case PSYCH:
+					case PSYCH: // Psych to Evolution
 						var data:PsychCharacter = unsafeJson;
 						var animations:Array<AnimationData> = [];
 						for (animData in data.animations)
@@ -280,7 +283,8 @@ enum ChartEngineType
 						};
 
 						return returnData;
-					case UNKNOWN: return {};
+					default: // Unknown
+						return {};
 				}
 			case CODENAME:
 				// wip
@@ -288,7 +292,7 @@ enum ChartEngineType
 			case PSYCH:
 				// wip
 				return null;
-			case UNKNOWN:
+			default:
 				return null;
 		}
 		return null;
@@ -298,25 +302,71 @@ enum ChartEngineType
 		switch(from) {
 			case EVOLUTION:
 				switch(to) {
-					case EVOLUTION:
+					case EVOLUTION: // Evolution to Evolution
 						var data:StageData = TJSON.parse(content);
 						return data;
-					case CODENAME:
+					case CODENAME: // Evolution to CNE
 						// wip
 						return null;
-					case PSYCH:
-						// wip
-						return null;
-					case UNKNOWN:
+					case PSYCH: // Evolution to Psych
+						var evoData:StageData = TJSON.parse(content);
+						var data:PsychStageData = {
+							defaultZoom: evoData.defaultCamZoom ?? 0.8,
+							boyfriend: [0, 0],
+							girlfriend: [0, 0],
+							opponent: [0, 0],
+						};
+
+						// Characters
+						var boyfriend:StageCharacter = evoData.characters[1];
+						Reflect.setField(data, "boyfriend", [boyfriend.x ?? 0, boyfriend.y ?? 0]);
+						Reflect.setField(data, "camera_boyfriend", boyfriend.cameraOffsets ?? [0, 0]);
+
+						var gf:StageCharacter = evoData.characters[2];
+						Reflect.setField(data, "girlfriend", [gf.x ?? 0, gf.y ?? 0]);
+						Reflect.setField(data, "camera_girlfriend", gf.cameraOffsets ?? [0, 0]);
+
+						var dad:StageCharacter = evoData.characters[0];
+						Reflect.setField(data, "opponent", [dad.x ?? 0, dad.y ?? 0]);
+						Reflect.setField(data, "camera_opponent", dad.cameraOffsets ?? [0, 0]);
+
+						return data;
+					default: // Unknown
 						return null;
 				}
 			case CODENAME:
 				// wip
 				return null;
 			case PSYCH:
-				// wip
+				switch(to) {
+					case EVOLUTION: // Psych to Evolution
+
+						// TODO: Add parsing for Psych 1.0 stage editor sprites
+						var psychData:PsychStageData = TJSON.parse(content);
+						var data:StageData = {characters: [], sprites: []};
+
+						// Characters
+						Reflect.setField(data, "characters", [
+							{x: psychData.opponent[0], y: psychData.opponent[1], cameraOffsets: psychData.camera_opponent ?? [0, 0]},
+							{x: psychData.boyfriend[0], y: psychData.boyfriend[1], cameraOffsets: psychData.camera_boyfriend ?? [0, 0]},
+							{x: psychData.girlfriend[0], y: psychData.girlfriend[1], cameraOffsets: psychData.camera_girlfriend ?? [0, 0]}
+						]);
+
+						Reflect.setField(data, "defaultCamZoom", psychData.defaultZoom);
+						Reflect.setField(data, "evoStage", true);
+
+						return data;
+					case CODENAME: // Psych to CNE
+						// wip
+						return null;
+					case PSYCH: // Psych to Psych
+						var data:PsychStageData = TJSON.parse(content);
+						return data;
+					default:
+						return null;
+				}
 				return null;
-			case UNKNOWN:
+			default:
 				return null;
 		}
 	}

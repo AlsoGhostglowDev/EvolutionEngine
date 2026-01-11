@@ -95,13 +95,7 @@ class HScript extends Script {
 			}
 		} catch(e) {
 			if (options.ignoreErrors != null && !options.ignoreErrors) {
-				#if !hl
-				FlxG.stage.window.alert('Error on haxe script "${this.path}".\n${e.toString()}', 'HScript Error!');
-				#else
-				var unimportant = new haxe.EnumFlags<hl.UI.DialogFlags>();
-				unimportant.set(hl.UI.DialogFlags.YesNo);
-				hl.UI.dialog('HScript Error!', 'Error on haxe script.\n${e.toString()}', unimportant);
-				#end
+				windowAlert('HScript Error!', 'Error on haxe script.\n${e.toString()}');
 				trace('Error on haxe script "${this.path}":\n${e.toString()}');
 			}
 		}

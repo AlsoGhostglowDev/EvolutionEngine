@@ -28,6 +28,25 @@ typedef StageData = {
 	?defaultCamZoom:Float,
 }
 
+// This is only for the Parser
+typedef PsychStageData = {
+	defaultZoom:Float,
+	boyfriend:Array<Dynamic>,
+	girlfriend:Array<Dynamic>,
+	opponent:Array<Dynamic>,
+
+	?camera_boyfriend:Array<Float>,
+	?camera_opponent:Array<Float>,
+	?camera_girlfriend:Array<Float>,
+
+	?directory:String,
+	?isPixelStage:Bool,
+	?stageUI:String,
+
+	?hide_girlfriend:Bool,
+	?camera_speed:Null<Float>
+}
+
 class Stage extends FlxSpriteGroup implements IBeatListener
 {
 	public var state:MusicBeatState;
@@ -39,6 +58,8 @@ class Stage extends FlxSpriteGroup implements IBeatListener
 
 	public var songName(get, never):String;
 	public var songPath(get, never):String;
+
+	public var name:Null<String>;
 
 	function get_characters()
 		return getFromGame(s -> return s.characters);
@@ -68,6 +89,7 @@ class Stage extends FlxSpriteGroup implements IBeatListener
 	{
 		super();
 		state = MusicBeatState.getState();
+		name = path;
 
 		if (path != null) {
 			final sourceData = Paths.stage(path);

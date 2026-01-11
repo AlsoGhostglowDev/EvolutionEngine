@@ -16,6 +16,14 @@ import sys.thread.Thread;
 
 @:publicFields class FunkinUtil
 {
+	static inline function windowAlert(title:String, body:String) {
+		#if !hl
+		FlxG.stage.window.alert(body, title);
+		#else
+		hl.UI.dialog(title, body, null);
+		#end
+	}
+
 	static inline function getLerpRatio(ratio:Float, ?elapsed:Float)
 		return 1.0 - Math.pow(1.0 - ratio, (elapsed ?? FlxG.elapsed) * 60);
 

@@ -237,7 +237,9 @@ class PlayState extends ScriptableState {
         // loading stage
         stage = new ScriptableStage(song.stage);
         add(stage);
+
         camGame.defaultCamZoom = stage?.defaultCamZoom ?? 0.9;
+		camGame.zoom = camGame.defaultCamZoom;
 
         scrollSpeed = (song?.scrollSpeed ?? 1) * GameplayModifiers.scrollMult;
         

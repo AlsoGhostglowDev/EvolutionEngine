@@ -95,7 +95,7 @@ class HScript extends Script {
 			}
 		} catch(e) {
 			if (options.ignoreErrors != null && !options.ignoreErrors) {
-				windowAlert('HScript Error!', 'Error on haxe script.\n${e.toString()}');
+				windowAlert('HScript Error!', e.toString());
 				trace('Error on haxe script "${this.path}":\n${e.toString()}');
 			}
 		}

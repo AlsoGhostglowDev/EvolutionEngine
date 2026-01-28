@@ -38,7 +38,7 @@ class HealthIcon extends FunkinSprite {
 			setPosition((posTracker.x ?? 0) + trackerOffset.x, (posTracker.y ?? 0) + trackerOffset.y);
         }
 
-		if (shouldLerp) {
+		if (shouldLerp) { // Idk I think using a tween is better but sure -TBar
 			scale.set(
 				FlxMath.lerp(scale.x, baseScale.x, getLerpRatio(lerpFactor)),
 				FlxMath.lerp(scale.y, baseScale.y, getLerpRatio(lerpFactor))

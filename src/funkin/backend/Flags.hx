@@ -15,3 +15,8 @@ package funkin.backend;
 	static var MODS_FOLDER:String = "mods";
 	// static var MULTIPLE_MODS_ALLOWED:Bool = true;
 }
+
+typedef Flag = {
+	var ?name:String;
+	@:default("1") var ?value:String;
+}

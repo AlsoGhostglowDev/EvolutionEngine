@@ -1,0 +1,19 @@
+{
+	"characters": [
+		{"x": 335, "y": 885,   "cameraOffsets": [0, 0]}, //dad
+		{"x": 989.5,  "y": 885, "cameraOffsets": [0, 0]}, //boyfriend
+		{"x": 751.5,  "y": 787, "cameraOffsets": [0, 0]} //gf
+	],
+	"sprites": [],
+	"defaultCamZoom": 0.5,
+    "evoStage": true,
+	"scripts": [
+		{"path": "data/stages/multi-script-stage/script one"},
+		{"path": "data/stages/multi-script-stage/script 2"},
+		{"code": "var a = 100; var b = 20; function create() { trace(a + b); }"},
+	]
+	"flags": [
+		{"name": "COOL_FUNC", "value": "true"},
+		{"name": "NOT_COOL_FUNC", "value": "false"}
+	]
+}

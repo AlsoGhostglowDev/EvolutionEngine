@@ -1,21 +1,32 @@
 package funkin.backend.scripting;
 
-import openfl.display3D.textures.Texture;
 import funkin.backend.utils.ScriptUtil;
 import funkin.backend.macros.Compiler;
+import funkin.backend.Flags.Flag;
 #if HSCRIPT_ALLOWED
 import hscript.Expr.Error as HScriptError;
-import hscript.Expr;
-import hscript.Interp;
 import hscript.Parser as HScriptParser; // To not confuse with the funkin parser
+import hscript.Interp;
+import hscript.Expr;
 import hscript.Printer;
 #end
 
 class HScript extends Script {
 	#if HSCRIPT_ALLOWED
+
+	/**
+	 * All static variables made by any script.
+	 *
+	 * If you are making a mod, make sure to clear this
+	 * map once the mod is closed to prevent another mod
+	 * using your variables!
+	 */
 	public static var staticVariables:Map<String, Dynamic> = [];
 
-	// Add pre-imported classes here
+	/**
+	 * All of the script's default imports.
+	 * You can add custom ones here too!
+	 */
 	public static var defaultClasses:Map<String, Dynamic> = [
 		//Basic types
 		"Int" => Int, "Float" => Float,
@@ -63,51 +74,77 @@ class HScript extends Script {
 	public var interp:Interp;
 	public var expr:Expr;
 
+	/**
+	 * The script's path.
+	 */
 	public var path:String;
 
+	/**
+	 * The script's options, like if it
+	 * should ignore errors, custom flags, etc.
+	 */
 	public var options:HScriptOptions;
+
+	/**
+	 * A shortcut to the script's parent object.
+	 */
+	public var parent(get, set):Dynamic;
+	public inline function get_parent():Dynamic { return interp.scriptObject; }
+	public inline function set_parent(val:Dynamic):Dynamic {
+		if(interp == null) return null;
+
+		interp.scriptObject = val;
+		if(val.variables != null) interp.publicVariables = val.variables;
+
+		return interp.scriptObject;
+	}
 
 	override public function new(path:String, ?options:HScriptOptions) {
 		super();
 
 		this.options = options;
 		this.path = path;
-		if(parser == null) initParser();
-		if(interp == null) initInterp();
+		this.options ??= {ignoreErrors: false, isString: false, customFlags: []};
+		this.options.isString ??= false; // Just making sure
 
-		options ??= {ignoreErrors: false, isString: false};
-		options.isString ??= false; // Just making sure
+		if(parser == null) initParser(this.options.customFlags);
+		if(interp == null) initInterp();
 
 		try
 		{
-			if (options.parent != null) this.setParent(options.parent);
+			if(this.options.parent != null) this.parent = this.options.parent;
+
 			interp.variables.set("this", this);
 			for (tag => value in defaultClasses) {
 				interp.variables.set(tag, value);
 			}
 
-			if(!options.isString) {
+			if(!this.options.isString) {
 				parser.line = 1;
-				expr = parser.parseString(FileUtil.getContent(path), path);
+				expr = parser.parseString(FileUtil.getContent(path), "HScript String");
 
 				interp.execute(expr);
 				call("new");
 			}
 		} catch(e) {
-			if (options.ignoreErrors != null && !options.ignoreErrors) {
+			if (this.options.ignoreErrors != null && !this.options.ignoreErrors) {
 				windowAlert('HScript Error!', e.toString());
 				trace('Error on haxe script "${this.path}":\n${e.toString()}');
 			}
 		}
 	}
 
-	public inline function initParser() {
+	public inline function initParser(?additionalConditionals:Array<Flag>) {
 		parser = new HScriptParser();
 		parser.allowJSON = parser.allowMetadata = parser.allowTypes = parser.allowRegex = true;
 
 		parser.preprocessorValues = Compiler.defines;
-		for(name => value in Compiler.custom_defines) {
+		for(name => value in Compiler.custom_defines)
 			parser.preprocessorValues.set(name, value);
+
+		if(additionalConditionals != null) {
+			for(flag in additionalConditionals)
+				parser.preprocessorValues.set(flag.name, flag.value);
 		}
 	}
 
@@ -156,14 +193,6 @@ class HScript extends Script {
 		trace("[WARNING] " + Printer.errorToString(e));
 	}
 
-	public inline function setParent(newParent:Dynamic):Null<Dynamic> {
-		if(interp == null) return null;
-
-		interp.scriptObject = newParent;
-		if (newParent.variables != null) interp.publicVariables = newParent.variables;
-		return this;
-	}
-
 	public function execute(codeToRun:String):Dynamic {
 		if (options.isString ?? false && parser != null) {
 			parser.line = 1;
@@ -178,12 +207,12 @@ class HScript extends Script {
 		parser = null;
 	}
 
-	override public function get(name:String):Dynamic {
-		return (interp != null ? interp.variables.get(name) : null);
+	override public inline function get(name:String):Dynamic {
+		return (this.interp != null ? this.interp.variables.get(name) : null);
 	}
 
-	override public function set(variable:String, data:Dynamic) {
-		if (interp != null) interp.variables.set(variable, data);
+	override public inline function set(variable:String, data:Dynamic) {
+		if(this.interp != null) this.interp.variables.set(variable, data);
 	}
 
 	override public function call(func:String, ?args:Array<Dynamic>):Dynamic {
@@ -196,9 +225,29 @@ class HScript extends Script {
 	#end
 }
 
-typedef HScriptOptions =
-{
-	@:optional var isString:Bool;
-	@:optional var parent:Dynamic;
-	@:optional var ignoreErrors:Bool;
+typedef HScriptOptions = {
+	/**
+	 * Whether the first argument is hscript code.
+	 * If false, then a script path is expected in it's place.
+	 * @default `false`
+	 */
+	@:default(false) var ?isString:Bool;
+
+	/**
+	 * The script's parent. Simple enough.
+	 */
+	var ?parent:Dynamic;
+
+	/**
+	 * Whether the script should show a message popup if
+	 * a fatal error happens.
+	 * @default `false`
+	 */
+	@:default(false) var ?ignoreErrors:Bool;
+
+	/**
+	 * Optional flags to add to the script. Can be accessed
+	 * using `#if #end` conditionals in the script.
+	 */
+	var ?customFlags:Array<Flag>;
 }

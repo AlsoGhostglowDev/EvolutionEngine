@@ -1,10 +1,11 @@
 package funkin.game;
 
-import flixel.math.FlxPoint;
-import funkin.game.Character;
-import funkin.game.HUD;
-import funkin.backend.system.Parser;
 import funkin.backend.system.Parser.EngineType;
+import funkin.backend.system.Parser;
+import funkin.backend.Flags.Flag;
+import funkin.game.Character;
+import flixel.math.FlxPoint;
+import funkin.game.HUD;
 
 import tjson.TJSON;
 
@@ -26,9 +27,12 @@ typedef StageData = {
 	characters:Array<StageCharacter>,
 	?sprites:Array<StageSprite>,
 	?defaultCamZoom:Float,
+	?flags:Array<Flag>,
+	?scripts:Array<{?path:String, ?code:String}>
 }
 
-// This is only for the Parser
+/* Other stage data in other Engines. This is only for the Parser */
+
 typedef PsychStageData = {
 	defaultZoom:Float,
 	boyfriend:Array<Dynamic>,

@@ -1,5 +1,7 @@
 package funkin.backend.system;
 
+import funkin.backend.utils.FunkinUtil;
+
 import funkin.game.Stage.StageData;
 import funkin.game.Stage.PsychStageData;
 import funkin.game.Stage.StageCharacter;
@@ -251,8 +253,84 @@ enum ChartEngineType
 						var data = unsafeJson;
 						return data;
 					case CODENAME: // CNE to Evolution
-						// wip
-						return {};
+						var data:Xml = unsafeJson;
+						var returnData:CharacterData = {
+							name: '',
+							icon: 'icon-face',
+							antialiasing: true,
+							source: 'characters/',
+							healthColors: 0xFF000000,
+							cameraOffsets: [0, 0],
+							holdTime: 1,
+							scale: 1,
+							flipped: false,
+							animations: []
+						};
+
+						var characterNode = data.firstElement();
+
+						/*
+						 * Here we check for the "sprite" node in the xml. If it doesn't exist,
+						 * then we use the xml file's name.
+						 */
+						if(characterNode.exists("sprite")) {
+							if(characterNode.get("sprite").startsWith("characters/")) returnData.source = characterNode.get("sprite");
+							else returnData.source = "characters/" + characterNode.get("sprite");
+						} else {
+							returnData.source = (new haxe.io.Path(path).file);
+						}
+
+						//Camera and Field Positions
+						var charPos:Array<Int> = [0, 0];
+						if(characterNode.exists("x")) charPos[0] = Std.parseInt(characterNode.get("x"));
+						if(characterNode.exists("y")) charPos[1] = Std.parseInt(characterNode.get("y"));
+						// returnData.position = charPos; // Dumbahh ghost didn't add a char pos
+
+						charPos = [0, 0]; //Reusing the char position array
+						if(characterNode.exists("camx")) charPos[0] = Std.parseInt(characterNode.get("camx"));
+						if(characterNode.exists("camy")) charPos[1] = Std.parseInt(characterNode.get("camy"));
+						returnData.cameraOffsets = charPos;
+
+						//Other Character stuff
+						if(characterNode.exists("antialiasing"))
+							returnData.antialiasing = (characterNode.get("antialiasing") == "false");
+
+						if(characterNode.exists("flipX"))
+							returnData.flipped = (characterNode.get("flipX") == "true");
+
+						if(characterNode.exists("holdTime"))
+							returnData.holdTime = Std.parseFloat(characterNode.get("holdTime"));
+
+						if(characterNode.exists("scale"))
+							returnData.holdTime = Std.parseFloat(characterNode.get("scale"));
+
+						if(characterNode.exists("icon"))
+							returnData.icon = Std.string(characterNode.get("icon"));
+
+						if(characterNode.exists("color"))
+							returnData.healthColors = FlxColor.fromString(Std.string(characterNode.get("color")));
+						
+						// Animations
+						for(animNode in characterNode.elements()) {
+							var charAnim:AnimationData = {animName: "NO_NAME", prefix: "NO_ANIMATION", looped: false, frameRate: 24, indices: [], offset: [0, 0]};
+
+							if(animNode.exists("name")) charAnim.animName = animNode.get("name");
+							if(animNode.exists("anim")) charAnim.prefix = animNode.get("anim");
+
+							if(animNode.exists("fps")) charAnim.frameRate = Std.parseInt(animNode.get("fps"));
+							if(animNode.exists("loop")) charAnim.looped = (animNode.get("loop") == "true");
+
+							var animOffsets:Array<Int> = [0, 0];
+							if(animNode.exists("x")) animOffsets[0] = Std.parseInt(animNode.get("x"));
+							if(animNode.exists("y")) animOffsets[1] = Std.parseInt(animNode.get("y"));
+							charAnim.offset = animOffsets;
+
+							if(animNode.exists("indices")) charAnim.indices = FunkinUtil.parseXMLIndices(animNode.get("indices"));
+
+							returnData.animations.push(charAnim);
+						}
+
+						return returnData;
 					case PSYCH: // Psych to Evolution
 						var data:PsychCharacter = unsafeJson;
 						var animations:Array<AnimationData> = [];

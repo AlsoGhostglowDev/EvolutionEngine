@@ -165,4 +165,82 @@ import haxe.EnumFlags;
 
 	static function average(...tally:Float)
 		return sum(...tally) / tally.length;
+
+	/* IGNORE THESE TWO, THESE ARE FOR CODENAME CONVERSION IN PARSER.HX */
+
+	//https://github.com/CodenameCrew/CodenameEngine/blob/main/source/funkin/backend/utils/CoolUtil.hx#L1116
+	static function parseXMLIndices(charAnim:String):Array<Int> {
+		var result:Array<Int> = [];
+		var parts:Array<String> = charAnim.split(",");
+
+		for (part in parts) {
+			part = part.trim();
+			var idx = part.indexOf("..");
+			if (idx != -1) {
+				var start = Std.parseInt(part.substring(0, idx).trim());
+				var end = Std.parseInt(part.substring(idx + 2).trim());
+
+				if(start == null || end == null) {
+					continue;
+				}
+
+				if (start < end) {
+					for (j in start...end+1) {
+						result.push(j);
+					}
+				} else {
+						for (j in end...start+1) {
+							result.push(start+end - j);
+						}
+					}
+			} else {
+				var num = Std.parseInt(part);
+				if (num != null) {
+					result.push(num);
+				}
+			}
+		}
+		return result;
+	}
+
+	//https://github.com/CodenameCrew/CodenameEngine/blob/main/source/funkin/backend/utils/CoolUtil.hx#L1157
+	static function formatXMLIndices(numbers:Array<Int>, separator:String = ","):String {
+		if (numbers.length == 0) return "";
+
+		var result:Array<String> = [];
+		var i = 0;
+
+		while (i < numbers.length) {
+			var start = numbers[i];
+			var end = start;
+			var direction = 0; // 0: no sequence, 1: increasing, -1: decreasing
+
+			if (i + 1 < numbers.length) { // detect direction of sequence
+				if (numbers[i + 1] == end + 1) {
+					direction = 1;
+				} else if (numbers[i + 1] == end - 1) {
+					direction = -1;
+				}
+			}
+
+			if(direction != 0) {
+				while (i + 1 < numbers.length && (numbers[i + 1] == end + direction)) {
+					end = numbers[i + 1];
+					i++;
+				}
+			}
+
+			if (start == end) { // no direction
+				result.push('${start}');
+			} else if (start + direction == end) { // 1 step increment
+				result.push('${start},${end}');
+			} else { // store as range
+				result.push('${start}..${end}');
+			}
+
+			i++;
+		}
+
+		return result.join(separator);
+	}
 }

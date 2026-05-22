@@ -10,9 +10,9 @@ import sys.io.File;
 import openfl.utils.Assets as OpenFLAssets;
 #end
 
- /**
-  * a Filesystem class to manage both Sys targets and HTML targets.
-  */
+/**
+ * a Filesystem class to manage both Sys targets and HTML targets.
+ */
 class FileUtil {
 	public static inline function getContent(filePath:String):String {
 		#if sys

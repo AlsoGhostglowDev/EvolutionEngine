@@ -128,7 +128,7 @@ class HScript extends Script {
 			}
 		} catch(e) {
 			if (this.options.ignoreErrors != null && !this.options.ignoreErrors) {
-				windowAlert('HScript Error!', e.toString());
+				alert('HScript Error!', e.toString());
 				trace('Error on haxe script "${this.path}":\n${e.toString()}');
 			}
 		}

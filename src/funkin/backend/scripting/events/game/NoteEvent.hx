@@ -13,6 +13,7 @@ class NoteEvent extends CancellableEvent
 	public var character:Character;
 	public var characterID:Int;
 	public var noteType:String;
+	public var isSustainNote:Bool;
 	public var strum:Strum;
 	public var cpu:Bool;
 
@@ -26,6 +27,7 @@ class NoteEvent extends CancellableEvent
 		character = note.character;
 		characterID = note.characterID;
 		noteType = note.noteType;
+		isSustainNote = note.isSustainNote;
 		strum = note.strum;
 		cpu = strum.cpu;
 	}

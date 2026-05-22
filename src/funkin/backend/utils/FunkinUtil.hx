@@ -13,25 +13,9 @@ import lime.app.Future;
 #if sys
 import sys.thread.Thread;
 #end
-#if hl
-import hl.UI;
-import haxe.EnumFlags;
-#end
 
 @:publicFields class FunkinUtil
 {
-	/*
-	 * This is because hashlink has this weird issue with base window.alert that
-	 * messes up the text.
-	 */
-	static inline function windowAlert(title:String, body:String) {
-		#if !hl
-		FlxG.stage.window.alert(body, title);
-		#else
-		UI.dialog(title, body, new EnumFlags<DialogFlags>());
-		#end
-	}
-
 	static inline function getLerpRatio(ratio:Float, ?elapsed:Float)
 		return 1.0 - Math.pow(1.0 - ratio, (elapsed ?? FlxG.elapsed) * 60);
 
